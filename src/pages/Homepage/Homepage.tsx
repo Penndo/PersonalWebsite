@@ -54,7 +54,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <div className="intro-wrapper">
+          {/* <div className="intro-wrapper"> */}
             <div className="floating-icons-left">
               <motion.div 
                 className="floating-icon icon-hooinn"
@@ -77,7 +77,8 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
             </div>
 
             <div className="intro-card">
-              <div className="intro-bg"></div>
+              <div className="intro-layer intro-layer-1"></div>
+              <div className="intro-layer intro-layer-2"></div>
               <div className="intro-content">
                 <h2 className="intro-title">👋 欢迎光临！</h2>
                 <p className="intro-text">{userInfo.introduction}</p>
@@ -104,7 +105,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
                 <img src="/icons/EZC-Hover.png" alt="EZC Hover" className="icon-hover" />
               </motion.div>
             </div>
-          </div>
+          {/* </div> */}
         </motion.div>
 
         <motion.div 

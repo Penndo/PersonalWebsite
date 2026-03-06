@@ -5,13 +5,30 @@
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  background: linear-gradient(135deg, @primary-color 0%, @primary-yellow 100%);
+  background: linear-gradient(180deg, #FFED67 0%, #FFB330 100%);
   border-radius: @border-radius-sm;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 20px rgba(255, 215, 103, 0.3);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 4px 16px 0 rgba(88, 43, 4, 0.30);
   cursor: pointer;
   transition: all @transition-fast;
-  
+  border-radius: 8px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
   &:hover {
     box-shadow: 0 6px 30px rgba(255, 215, 103, 0.5);
   }

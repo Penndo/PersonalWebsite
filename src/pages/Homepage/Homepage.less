@@ -26,7 +26,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
+  gap: 4vh;
   padding: 80px 24px;
   position: relative;
   z-index: 1;
@@ -83,26 +83,11 @@
 
 .intro-section {
   width: 100%;
-  max-width: 800px;
+  height: 100%;
+  max-height: 100vh;
+  max-width: 100vw;
   display: flex;
   justify-content: center;
-}
-
-.intro-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  width: 100%;
-  position: relative;
-}
-
-.floating-icons-left,
-.floating-icons-right {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  flex-shrink: 0;
-  position: relative;
 }
 
 .floating-icons-left {
@@ -120,14 +105,50 @@
   width: 100%;
   max-width: 480px;
   flex-shrink: 0;
+  padding: 24px;
+  transition: transform 0.3s ease 0s;
+
+  &:hover {
+    // transform: scale(1.05) translateY(-8px);
+
+    .intro-content {
+      transform: scale(1.05) translate(0px, -8px);
+      transition: transform 0.4s ease 0.1s;
+    }
+
+    .intro-layer-2 {
+      transform: scale(1.05)  translate(0px, 16px);
+      transition: transform 0.5s ease 0.2s;
+    }
+
+    .intro-layer-1 {
+      transform: scale(1.05) translate(0px, 40px);
+      transition: transform 0.6s ease 0.3s;
+    }
+
+
+  }
 }
 
-.intro-bg {
+.intro-layer {
   position: absolute;
-  inset: 16px;
-  background: @bg-card-inner;
-  border-radius: @border-radius-md;
+  border-radius: @border-radius-lg;
   border: 2px solid @border-color;
+  transition: transform 0.3s ease 0s;
+}
+
+.intro-layer-1 {
+  inset: 0;
+  background: lighten(@bg-card-inner, 5%);
+  inset: 48px;
+  transform: translate(0px, 48px);
+}
+
+.intro-layer-2 {
+  inset: 0;
+  background: lighten(@bg-card-inner, 4%);
+  inset: 36px;
+  transform: translate(0px, 24px);
 }
 
 .intro-content {
@@ -140,6 +161,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  transition: transform 0.3s ease 0s;
 }
 
 .intro-title {
@@ -151,12 +173,13 @@
 }
 
 .intro-text {
-  font-size: 14px;
+  font-size: 16px;
   color: @text-secondary;
   line-height: 1.8;
   margin: 0;
-  text-align: center;
+  text-align: left;
   white-space: pre-line;
+  text-indent: 2em;
 }
 
 .floating-icon {
@@ -169,8 +192,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 160px;
   cursor: pointer;
   overflow: visible;
   transition: transform 0.3s ease;
@@ -190,22 +213,22 @@
 
   .icon-default {
     opacity: 1;
-    transform: translate(24px, -24px) scale(1);
+    transform: translate(0, 0) scale(1);
   }
 
   .icon-hover {
     opacity: 0;
-    transform: translate(0, 0) scale(1.05);
+    transform: translate(0, 0) scale(1);
   }
 
   &:hover {
     .icon-default {
       opacity: 0;
-      transform: translate(-8px, 8px) scale(0.95);
+      transform: translate(0, 0) scale(1);
     }
     .icon-hover {
       opacity: 1;
-      transform: translate(0, 0) scale(1.05);
+      transform: translate(0, 0) scale(1);
     }
   }
 }
@@ -214,24 +237,40 @@
   border-radius: 109px;
   width: 140px;
   height: 140px;
+  position: relative;
+  left: -200px;
+  top: -40px;
+  // margin: -15px 0 0 -10px;
   animation: float1 4s ease-in-out infinite;
 }
 
 .icon-kaiyun {
   width: 140px;
   height: 140px;
+  position: relative;
+  left: -80px;
+  top: 40px;
+  // margin: 20px 0 0 5px;
   animation: float2 5s ease-in-out infinite 0.5s;
 }
 
 .icon-pub {
   width: 140px;
   height: 140px;
+  position: relative;
+  left: 160px;
+  top: 0px;
+  // margin: -5px 0 0 15px;
   animation: float3 4.5s ease-in-out infinite 1s;
 }
 
 .icon-ezc {
   width: 140px;
   height: 140px;
+  position: relative;
+  left: 40px;
+  top: 20px;
+  // margin: 15px 0 0 -5px;
   animation: float4 5.5s ease-in-out infinite 1.5s;
 }
 
@@ -330,9 +369,5 @@
   .floating-icons-left,
   .floating-icons-right {
     display: none;
-  }
-  
-  .intro-section {
-    max-width: calc(100vw - 48px);
   }
 }
