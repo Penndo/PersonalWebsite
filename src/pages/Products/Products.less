@@ -1,0 +1,114 @@
+@import '@/styles/variables.less';
+
+.products {
+  min-height: 100vh;
+  width: 100%;
+  background: @bg-dark;
+  position: relative;
+  padding-top: 120px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 30% 20%, rgba(255, 215, 103, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(255, 223, 43, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.products-header {
+  position: fixed;
+  top: 24px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+  width: 100%;
+  pointer-events: none;
+  
+  & > * {
+    pointer-events: auto;
+  }
+}
+
+.products-content {
+  max-width: 1256px;
+  margin: 0 auto;
+  padding: 0 92px;
+  position: relative;
+  z-index: 1;
+}
+
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  
+  @media (max-width: @screen-xl) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (max-width: @screen-lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: @screen-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.articles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.plugins-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  
+  @media (max-width: @screen-lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: @screen-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid @glass-bg-lighter;
+  border-top-color: @primary-color;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: @screen-md) {
+  .products-content {
+    padding: 0 24px;
+  }
+}

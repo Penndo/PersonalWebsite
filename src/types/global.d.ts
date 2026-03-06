@@ -1,0 +1,19 @@
+/// <reference types="vite/client" />
+
+declare module '*.less' {
+  const content: { [className: string]: string };
+  export default content;
+}
+
+declare module '*.css' {
+  const content: { [className: string]: string };
+  export default content;
+}
+
+interface ImportMetaEnv {
+  readonly VITE_API_BASE_URL: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}

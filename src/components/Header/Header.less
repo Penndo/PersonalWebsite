@@ -1,0 +1,63 @@
+@import '@/styles/variables.less';
+
+.header {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  pointer-events: none;
+  
+  & > * {
+    pointer-events: auto;
+  }
+}
+
+.header-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: @border-radius-lg;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform @transition-fast;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  .logo-avatar {
+    width: 100%;
+    height: 100%;
+    background: @glass-bg;
+    border-radius: @border-radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.header-menu {
+  width: 44px;
+  height: 44px;
+  background: @glass-bg;
+  border-radius: @border-radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  
+  .menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
