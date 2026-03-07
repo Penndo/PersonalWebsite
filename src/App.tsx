@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Homepage, Products } from '@/pages';
+import { GradientBackground, DynamicParticles } from '@/components';
 import { mockUserInfo } from '@/services/mock';
 import './styles/global.less';
 
@@ -12,6 +13,8 @@ function App() {
 
   return (
     <div className="app">
+      <GradientBackground />
+      <DynamicParticles />
       <Homepage 
         userInfo={mockUserInfo} 
         onScrollDown={scrollToProducts}

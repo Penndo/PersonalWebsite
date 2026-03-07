@@ -7,13 +7,17 @@ import './Products.less';
 
 const Products: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('works');
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
-  const [articles, setArticles] = useState<Article[]>(mockArticles);
-  const [plugins, setPlugins] = useState<Plugin[]>(mockPlugins);
+  const [projects] = useState<Project[]>(mockProjects);
+  const [articles] = useState<Article[]>(mockArticles);
+  const [plugins] = useState<Plugin[]>(mockPlugins);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
+    // setProjects(mockProjects);
+    // setArticles(mockArticles);
+    // setPlugins(mockPlugins);
+    
+    // Avoid calling setLoading(true) directly to prevent cascading renders
     const timer = setTimeout(() => {
       setLoading(false);
     }, 300);
