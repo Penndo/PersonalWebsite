@@ -11,12 +11,29 @@ const Products: React.FC = () => {
   const [articles] = useState<Article[]>(mockArticles);
   const [plugins] = useState<Plugin[]>(mockPlugins);
   const [loading, setLoading] = useState(false);
+  const [showNav, setShowNav] = useState(false);
 
   useEffect(() => {
-    // setProjects(mockProjects);
-    // setArticles(mockArticles);
-    // setPlugins(mockPlugins);
+    const handleScroll = () => {
+      const windowHeight = window.innerHeight;
+      const scrollY = window.scrollY;
+      
+      // Show Nav when we are significantly into the products section
+      if (scrollY > windowHeight * 0.8) {
+        setShowNav(true);
+      } else {
+        setShowNav(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Trigger once on mount
+    handleScroll();
     
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
     // Avoid calling setLoading(true) directly to prevent cascading renders
     const timer = setTimeout(() => {
       setLoading(false);
@@ -114,14 +131,19 @@ const Products: React.FC = () => {
     <section className="products">
       <Header />
       
-      <motion.div 
-        className="products-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
-      </motion.div>
+      <AnimatePresence>
+        {showNav && (
+          <motion.div 
+            className="products-header"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="products-content">
         <AnimatePresence mode="wait">

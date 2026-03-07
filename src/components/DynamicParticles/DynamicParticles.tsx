@@ -32,7 +32,7 @@ const DynamicParticles: React.FC = () => {
 
     let animationFrameId: number;
     let particles: Particle[] = [];
-    const particleCount = 60;
+    const particleCount = 160;
     const connectionDistance = 150;
     const mouseRadius = 200;
 
@@ -50,7 +50,7 @@ const DynamicParticles: React.FC = () => {
           y: Math.random() * canvas.height,
           vx: (Math.random() - 0.5) * 0.5,
           vy: (Math.random() - 0.5) * 0.5,
-          size: Math.random() * 1.5 + 0.5,
+          size: Math.random() * 2 + 0.5,
           color: 'rgba(255, 215, 103, 0.3)', // Matching the theme's yellow accent
         });
       }
