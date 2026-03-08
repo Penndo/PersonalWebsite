@@ -15,6 +15,22 @@ export interface Project {
   link?: string;
 }
 
+export interface ProjectDetail {
+  id: string;
+  title: string;
+  summary: string;
+  background: string;
+  designThinking: string;
+  images: string[];
+  tags: string[];
+  achievements: string[];
+  client: string;
+  year: string;
+  role: string;
+  tools: string[];
+  link?: string;
+}
+
 export interface Article {
   id: string;
   title: string;

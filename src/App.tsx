@@ -26,6 +26,8 @@ function App() {
   };
 
   useEffect(() => {
+    let scrollTimeout: NodeJS.Timeout;
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
@@ -41,11 +43,30 @@ function App() {
         else if (currentSection === 'products' && currentScrollY < windowHeight - 10) {
           scrollToTop();
         }
+
+        // Debounce check for small scrolls (<= 10px) to snap back
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          if (!isScrolling) {
+            const currentY = window.scrollY;
+            // If at home and scrolled a tiny bit (<= 10px), snap back to top
+            if (currentSection === 'home' && currentY > 0 && currentY <= 10) {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            // If at products and scrolled up a tiny bit (>= height - 10px), snap back to products
+            else if (currentSection === 'products' && currentY >= windowHeight - 10 && currentY < windowHeight) {
+              productsRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }
+        }, 100);
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
   }, [isScrolling, currentSection]);
 
   return (

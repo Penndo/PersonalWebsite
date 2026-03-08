@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header, TabNav, Card } from '@/components';
 import { mockProjects, mockArticles, mockPlugins } from '@/services/mock';
@@ -6,6 +7,7 @@ import type { TabType, Project, Article, Plugin } from '@/types';
 import './Products.less';
 
 const Products: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('works');
   const [projects] = useState<Project[]>(mockProjects);
   const [articles] = useState<Article[]>(mockArticles);
@@ -80,7 +82,7 @@ const Products: React.FC = () => {
                 description={project.description}
                 cover={project.cover || `https://picsum.photos/400/300?random=${index}`}
                 variant="vertical"
-                onClick={() => console.log('Project clicked:', project.id)}
+                onClick={() => navigate(`/project/${project.id}`)}
               />
             </motion.div>
           ))}
