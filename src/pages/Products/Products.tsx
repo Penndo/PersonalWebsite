@@ -1,19 +1,34 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header, TabNav, Card } from '@/components';
 import { mockProjects, mockArticles, mockPlugins } from '@/services/mock';
 import type { TabType, Project, Article, Plugin } from '@/types';
 import './Products.less';
 
+const getInitialTab = (hash: string): TabType => {
+  const tabMap: Record<string, TabType> = {
+    '#works': 'works',
+    '#articles': 'articles',
+    '#plugins': 'plugins',
+  };
+  return tabMap[hash] || 'works';
+};
+
 const Products: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<TabType>('works');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<TabType>(() => getInitialTab(location.hash));
   const [projects] = useState<Project[]>(mockProjects);
   const [articles] = useState<Article[]>(mockArticles);
   const [plugins] = useState<Plugin[]>(mockPlugins);
   const [loading, setLoading] = useState(false);
   const [showNav, setShowNav] = useState(false);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    navigate(`#${tab}`, { replace: true });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +49,11 @@ const Products: React.FC = () => {
     
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const tab = getInitialTab(location.hash);
+    setActiveTab(tab);
+  }, [location.hash]);
 
   useEffect(() => {
     // Avoid calling setLoading(true) directly to prevent cascading renders
@@ -100,7 +120,7 @@ const Products: React.FC = () => {
                 description={article.description}
                 cover={article.cover || `https://picsum.photos/200/150?random=${index + 10}`}
                 variant="horizontal"
-                onClick={() => console.log('Article clicked:', article.id)}
+                onClick={() => navigate(`/article/${article.id}`)}
               />
             </motion.div>
           ))}
@@ -118,7 +138,7 @@ const Products: React.FC = () => {
                 description={plugin.description}
                 cover={plugin.cover || `https://picsum.photos/300/200?random=${index + 20}`}
                 variant="vertical"
-                onClick={() => console.log('Plugin clicked:', plugin.id)}
+                onClick={() => navigate(`/plugin/${plugin.id}`)}
               />
             </motion.div>
           ))}
@@ -142,7 +162,7 @@ const Products: React.FC = () => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
-            <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
+            <TabNav activeTab={activeTab} onTabChange={handleTabChange} />
           </motion.div>
         )}
       </AnimatePresence>

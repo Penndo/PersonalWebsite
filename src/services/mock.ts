@@ -1,4 +1,4 @@
-import type { UserInfo, Project, ProjectDetail, Article, Plugin } from '@/types';
+import type { UserInfo, Project, ProjectDetail, Article, ArticleDetail, Plugin, PluginDetail } from '@/types';
 
 export const mockUserInfo: UserInfo = {
   name: 'Yeatfish',
@@ -192,5 +192,293 @@ export const mockProjectDetail: Record<string, ProjectDetail> = {
     role: '产品设计 / 可视化设计',
     tools: ['Figma', 'Blender', 'D3.js', 'Three.js'],
     link: '',
+  },
+};
+
+export const mockArticleDetail: Record<string, ArticleDetail> = {
+  '1': {
+    id: '1',
+    title: '设计系统构建指南',
+    description: '如何从零开始构建一套完整的设计系统，包括设计语言、组件库和文档规范...',
+    cover: '',
+    date: '2024-01-15',
+    link: 'https://example.com/article/1',
+    readingTime: 8,
+    views: 1250,
+    tags: ['设计系统', 'UI设计', '组件库', '设计规范'],
+    content: `
+      <h2>什么是设计系统</h2>
+      <p>设计系统是一套完整的标准，旨在通过可复用的组件和模式来管理设计。它包含设计语言、组件库、样式指南和设计原则，帮助团队保持一致性和效率。</p>
+      
+      <h2>为什么需要设计系统</h2>
+      <p>随着产品规模的扩大，设计不一致的问题会越来越明显。设计系统能够：</p>
+      <ul>
+        <li>提高设计和开发效率</li>
+        <li>保证产品体验的一致性</li>
+        <li>降低维护成本</li>
+        <li>促进团队协作</li>
+      </ul>
+      
+      <h2>如何构建设计系统</h2>
+      <p>构建设计系统是一个渐进的过程，需要从以下几个方面入手：</p>
+      <h3>1. 定义设计语言</h3>
+      <p>设计语言是设计系统的核心，包括色彩、字体、图标、间距等视觉元素。这些元素需要基于品牌调性和用户需求来定义。</p>
+      
+      <h3>2. 建立组件库</h3>
+      <p>组件库是设计系统的实现层，包含按钮、输入框、卡片等基础组件。每个组件都需要有明确的使用场景和规范。</p>
+      
+      <h3>3. 编写文档</h3>
+      <p>完善的文档是设计系统成功的关键。文档应该包含设计原则、组件使用指南、最佳实践等内容。</p>
+    `,
+    author: {
+      name: 'Yeatfish',
+      avatar: '',
+      bio: 'UI/UX设计师，专注于设计系统和用户体验',
+    },
+  },
+  '2': {
+    id: '2',
+    title: '用户体验设计方法论',
+    description: '深入探讨用户体验设计的核心方法论，从用户研究到设计验证的完整流程...',
+    cover: '',
+    date: '2024-02-20',
+    link: 'https://example.com/article/2',
+    readingTime: 12,
+    views: 980,
+    tags: ['用户体验', '设计方法', '用户研究', '设计验证'],
+    content: `
+      <h2>用户体验设计的核心</h2>
+      <p>用户体验设计是以用户为中心的设计方法，关注用户在使用产品过程中的感受和体验。好的用户体验能够提升用户满意度和产品价值。</p>
+      
+      <h2>设计流程</h2>
+      <h3>1. 用户研究</h3>
+      <p>了解用户需求是设计的第一步。通过访谈、问卷、观察等方法收集用户信息，建立用户画像。</p>
+      
+      <h3>2. 信息架构</h3>
+      <p>合理的信息架构能够帮助用户快速找到所需内容。需要考虑内容的组织方式和导航结构。</p>
+      
+      <h3>3. 交互设计</h3>
+      <p>交互设计关注用户与产品的互动方式。需要设计清晰的操作流程和反馈机制。</p>
+      
+      <h3>4. 视觉设计</h3>
+      <p>视觉设计不仅关乎美观，更影响用户的使用体验。需要平衡美学和功能性。</p>
+      
+      <h3>5. 设计验证</h3>
+      <p>通过可用性测试、A/B测试等方法验证设计方案，持续优化用户体验。</p>
+    `,
+    author: {
+      name: 'Yeatfish',
+      avatar: '',
+      bio: 'UI/UX设计师，专注于用户体验设计',
+    },
+  },
+  '3': {
+    id: '3',
+    title: '产品思维与设计思维',
+    description: '产品思维与设计思维的区别与融合，如何在项目中平衡商业目标与用户需求...',
+    cover: '',
+    date: '2024-03-10',
+    link: 'https://example.com/article/3',
+    readingTime: 10,
+    views: 1500,
+    tags: ['产品思维', '设计思维', '商业目标', '用户需求'],
+    content: `
+      <h2>两种思维的差异</h2>
+      <p>产品思维关注商业价值和市场机会，强调解决问题和实现目标。设计思维关注用户需求和体验，强调同理心和创新。</p>
+      
+      <h2>产品思维的核心</h2>
+      <ul>
+        <li><strong>商业目标：</strong>理解产品的商业模式和盈利方式</li>
+        <li><strong>市场定位：</strong>明确产品的目标用户和竞争优势</li>
+        <li><strong>数据驱动：</strong>用数据指导产品决策</li>
+        <li><strong>迭代优化：</strong>持续改进产品功能</li>
+      </ul>
+      
+      <h2>设计思维的核心</h2>
+      <ul>
+        <li><strong>用户同理心：</strong>深入理解用户需求和痛点</li>
+        <li><strong>定义问题：</strong>准确把握问题的本质</li>
+        <li><strong>创意发散：</strong>探索多种解决方案</li>
+        <li><strong>原型验证：</strong>快速验证设计想法</li>
+      </ul>
+      
+      <h2>融合两种思维</h2>
+      <p>优秀的产品需要同时兼顾商业价值和用户体验。产品思维确保方向正确，设计思维确保体验优秀。两者相辅相成，共同推动产品成功。</p>
+    `,
+    author: {
+      name: 'Yeatfish',
+      avatar: '',
+      bio: 'UI/UX设计师 & 产品经理',
+    },
+  },
+  '4': {
+    id: '4',
+    title: 'AI时代的设计趋势',
+    description: '探讨人工智能时代下设计师需要掌握的新技能和面临的机遇与挑战...',
+    cover: '',
+    date: '2024-04-05',
+    link: 'https://example.com/article/4',
+    readingTime: 15,
+    views: 2100,
+    tags: ['人工智能', '设计趋势', 'AI设计', '未来设计'],
+    content: `
+      <h2>AI对设计的影响</h2>
+      <p>人工智能正在深刻改变设计行业。从自动化设计到智能辅助，AI工具正在提升设计效率，同时也对设计师提出了新的要求。</p>
+      
+      <h2>AI设计工具的发展</h2>
+      <h3>1. 图像生成</h3>
+      <p>Midjourney、DALL-E等工具能够根据文字描述生成高质量图像，为设计师提供创意灵感。</p>
+      
+      <h3>2. 界面设计</h3>
+      <p>AI可以根据需求自动生成界面设计，大大提高设计效率。但设计师仍需要把控整体体验。</p>
+      
+      <h3>3. 代码生成</h3>
+      <p>AI可以将设计稿直接转换为代码，缩短设计与开发之间的距离。</p>
+      
+      <h2>设计师的新技能</h2>
+      <ul>
+        <li><strong>AI工具使用：</strong>熟练掌握各类AI设计工具</li>
+        <li><strong>提示词工程：</strong>学会与AI有效沟通</li>
+        <li><strong>批判性思维：</strong>判断AI生成内容的优劣</li>
+        <li><strong>战略思维：</strong>专注于更高层次的设计决策</li>
+      </ul>
+      
+      <h2>未来展望</h2>
+      <p>AI不会取代设计师，但会使用AI的设计师将取代不会使用AI的设计师。拥抱变化，持续学习，才能在AI时代保持竞争力。</p>
+    `,
+    author: {
+      name: 'Yeatfish',
+      avatar: '',
+      bio: '关注AI与设计融合的探索者',
+    },
+  },
+  '5': {
+    id: '5',
+    title: '移动端交互设计最佳实践',
+    description: '移动端应用交互设计的最佳实践，包括手势设计、动效设计和用户体验优化...',
+    cover: '',
+    date: '2024-05-18',
+    link: 'https://example.com/article/5',
+    readingTime: 11,
+    views: 1800,
+    tags: ['移动端', '交互设计', '手势设计', '动效设计'],
+    content: `
+      <h2>移动端设计的特点</h2>
+      <p>移动设备有其独特的使用场景和限制。屏幕尺寸小、使用环境多变、操作方式以触摸为主，这些因素都影响着移动端的设计决策。</p>
+      
+      <h2>手势设计原则</h2>
+      <h3>1. 符合直觉</h3>
+      <p>手势操作应该符合用户的认知习惯。例如，左右滑动切换内容，下拉刷新等。</p>
+      
+      <h3>2. 可见性</h3>
+      <p>可手势操作的区域需要有明确的视觉提示，让用户知道这里可以交互。</p>
+      
+      <h3>3. 容错性</h3>
+      <p>手势识别需要有一定的容错空间，避免用户因为操作不精确而失败。</p>
+      
+      <h2>动效设计</h2>
+      <p>合理的动效能够提升用户体验：</p>
+      <ul>
+        <li><strong>过渡动画：</strong>让界面变化更加自然</li>
+        <li><strong>反馈动画：</strong>确认用户的操作</li>
+        <li><strong>引导动画：</strong>帮助用户理解功能</li>
+        <li><strong>情感化动画：</strong>增加产品的趣味性</li>
+      </ul>
+      
+      <h2>性能优化</h2>
+      <p>移动端设备性能有限，动效需要优化性能：</p>
+      <ul>
+        <li>使用transform和opacity属性</li>
+        <li>避免触发重排</li>
+        <li>控制同时运行的动画数量</li>
+        <li>提供减少动效的选项</li>
+      </ul>
+    `,
+    author: {
+      name: 'Yeatfish',
+      avatar: '',
+      bio: '移动端设计专家',
+    },
+  },
+};
+
+export const mockPluginDetail: Record<string, PluginDetail> = {
+  '1': {
+    id: '1',
+    title: 'Figma Design Token Generator',
+    description: '自动从Figma设计文件生成设计令牌的工具插件，支持导出为CSS、JSON、SCSS等多种格式...',
+    cover: '',
+    link: 'https://figma.com/plugin/1',
+    version: '2.1.0',
+    downloads: 15000,
+    rating: 4.8,
+    tags: ['设计令牌', 'Figma插件', '开发工具', '设计系统'],
+    features: [
+      '自动提取颜色和字体样式',
+      '支持多种导出格式',
+      '实时同步设计变更',
+      '自定义命名规则',
+      '团队协作支持',
+    ],
+    screenshots: [
+      'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800',
+      'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800',
+    ],
+    author: {
+      name: 'Yeatfish',
+      avatar: '',
+    },
+  },
+  '2': {
+    id: '2',
+    title: 'Color Palette Creator',
+    description: '快速创建和管理配色方案的Figma插件，提供智能配色建议和色彩和谐工具...',
+    cover: '',
+    link: 'https://figma.com/plugin/2',
+    version: '1.5.2',
+    downloads: 8900,
+    rating: 4.6,
+    tags: ['配色工具', 'Figma插件', '色彩理论', '设计辅助'],
+    features: [
+      '智能配色建议',
+      '色彩和谐生成器',
+      'WCAG对比度检查',
+      '调色板导出',
+      '历史记录管理',
+    ],
+    screenshots: [
+      'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
+      'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=800',
+    ],
+    author: {
+      name: 'Yeatfish',
+      avatar: '',
+    },
+  },
+  '3': {
+    id: '3',
+    title: 'Icon Manager',
+    description: '图标管理和导出工具，支持多种格式和尺寸，帮助设计师高效管理图标资源...',
+    cover: '',
+    link: 'https://figma.com/plugin/3',
+    version: '3.0.1',
+    downloads: 22000,
+    rating: 4.9,
+    tags: ['图标管理', 'Figma插件', '资源管理', '导出工具'],
+    features: [
+      '批量导出多种格式',
+      '自动尺寸适配',
+      '图标分类管理',
+      '搜索和筛选',
+      '团队共享库',
+    ],
+    screenshots: [
+      'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800',
+      'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800',
+    ],
+    author: {
+      name: 'Yeatfish',
+      avatar: '',
+    },
   },
 };

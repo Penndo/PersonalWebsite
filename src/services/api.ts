@@ -1,6 +1,6 @@
 import axios from 'axios';
-import type { UserInfo, Project, ProjectDetail, Article, Plugin } from '@/types';
-import { mockProjectDetail } from './mock';
+import type { UserInfo, Project, ProjectDetail, Article, ArticleDetail, Plugin, PluginDetail } from '@/types';
+import { mockProjectDetail, mockArticleDetail, mockPluginDetail } from './mock';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
@@ -26,6 +26,30 @@ export const projectApi = {
 export const articleApi = {
   getArticles: () => api.get<Article[]>('/articles'),
   getArticleById: (id: string) => api.get<Article>(`/articles/${id}`),
+};
+
+export const getArticleDetail = async (id: string): Promise<ArticleDetail> => {
+  if (import.meta.env.DEV || !import.meta.env.VITE_API_BASE_URL) {
+    const article = mockArticleDetail[id];
+    if (!article) {
+      throw new Error('Article not found');
+    }
+    return article;
+  }
+  const response = await articleApi.getArticleById(id);
+  return response.data as ArticleDetail;
+};
+
+export const getPluginDetail = async (id: string): Promise<PluginDetail> => {
+  if (import.meta.env.DEV || !import.meta.env.VITE_API_BASE_URL) {
+    const plugin = mockPluginDetail[id];
+    if (!plugin) {
+      throw new Error('Plugin not found');
+    }
+    return plugin;
+  }
+  const response = await pluginApi.getPluginById(id);
+  return response.data as PluginDetail;
 };
 
 export const pluginApi = {

@@ -32,7 +32,7 @@ const ProjectDetail: React.FC = () => {
   }, [id]);
 
   const handleBack = () => {
-    navigate(-1);
+    navigate('/#works');
   };
 
   const handlePrevImage = () => {

@@ -31,7 +31,7 @@ const ArticleDetail: React.FC = () => {
   }, [id]);
 
   const handleBack = () => {
-    navigate(-1);
+    navigate('/#articles');
   };
 
   if (loading) {

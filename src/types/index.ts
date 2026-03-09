@@ -40,12 +40,48 @@ export interface Article {
   link?: string;
 }
 
+export interface ArticleDetail {
+  id: string;
+  title: string;
+  description: string;
+  cover: string;
+  date: string;
+  link?: string;
+  readingTime: number;
+  views: number;
+  tags: string[];
+  content: string;
+  author: {
+    name: string;
+    avatar: string;
+    bio: string;
+  };
+}
+
 export interface Plugin {
   id: string;
   title: string;
   description: string;
   cover: string;
   link?: string;
+}
+
+export interface PluginDetail {
+  id: string;
+  title: string;
+  description: string;
+  cover: string;
+  link?: string;
+  version: string;
+  downloads: number;
+  rating: number;
+  tags: string[];
+  features: string[];
+  screenshots: string[];
+  author: {
+    name: string;
+    avatar: string;
+  };
 }
 
 export type TabType = 'works' | 'articles' | 'plugins';

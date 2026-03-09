@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Homepage, Products } from '@/pages';
 import { GradientBackground, DynamicParticles } from '@/components';
 import { mockUserInfo } from '@/services/mock';
@@ -6,6 +7,7 @@ import './styles/global.less';
 
 function App() {
   const productsRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const [isScrolling, setIsScrolling] = useState(false);
   const [currentSection, setCurrentSection] = useState<'home' | 'products'>('home');
 
@@ -24,6 +26,15 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => setIsScrolling(false), 800);
   };
+
+  useEffect(() => {
+    if (location.hash && productsRef.current) {
+      const timer = setTimeout(() => {
+        scrollToSection(productsRef.current, 'products');
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash]);
 
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
