@@ -1,10 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './DynamicParticles.module.less';
 
-/**
- * @interface Particle
- * @description Represents a single particle in the animation.
- */
 interface Particle {
   x: number;
   y: number;
@@ -12,6 +8,7 @@ interface Particle {
   vy: number;
   size: number;
   color: string;
+  layer: 0 | 1;
 }
 
 /**
@@ -32,9 +29,14 @@ const DynamicParticles: React.FC = () => {
 
     let animationFrameId: number;
     let particles: Particle[] = [];
-    const particleCount = 160;
-    const connectionDistance = 150;
+    const particleCount = 170;
+    const baseConnectionDistance = 150;
     const mouseRadius = 200;
+
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /**
      * Initializes the canvas size and particles.
@@ -44,14 +46,26 @@ const DynamicParticles: React.FC = () => {
       canvas.height = window.innerHeight;
       particles = [];
 
+      const palette = [
+        'rgba(56, 189, 248, 0.45)',  // cyan
+        'rgba(129, 140, 248, 0.42)', // indigo
+        'rgba(244, 114, 182, 0.42)', // pink
+        'rgba(251, 191, 36, 0.24)',  // amber accent
+      ];
+
       for (let i = 0; i < particleCount; i++) {
+        const layer: 0 | 1 = Math.random() > 0.65 ? 1 : 0;
+        const speedFactor = layer ? 0.7 : 0.35;
+        const baseSize = layer ? Math.random() * 2.2 + 1.2 : Math.random() * 1.6 + 0.4;
+
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          size: Math.random() * 2 + 0.5,
-          color: 'rgba(255, 215, 103, 0.3)', // Matching the theme's yellow accent
+          vx: (Math.random() - 0.5) * speedFactor,
+          vy: (Math.random() - 0.5) * speedFactor,
+          size: baseSize,
+          color: palette[Math.floor(Math.random() * palette.length)],
+          layer,
         });
       }
     };
@@ -97,19 +111,24 @@ const DynamicParticles: React.FC = () => {
           const dy = p.y - p2.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
+          const sameLayer = p.layer === p2.layer;
+          const connectionDistance = sameLayer ? baseConnectionDistance + 40 : baseConnectionDistance - 30;
+
           if (distance < connectionDistance) {
-            const opacity = (1 - distance / connectionDistance) * 0.15;
+            const opacity = (1 - distance / connectionDistance) * (sameLayer ? 0.22 : 0.14);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(255, 215, 103, ${opacity})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `rgba(148, 163, 184, ${opacity})`;
+            ctx.lineWidth = sameLayer ? 0.7 : 0.4;
             ctx.stroke();
           }
         }
       });
 
-      animationFrameId = requestAnimationFrame(animate);
+      if (!prefersReducedMotion) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
 
     const handleMouseMove = (e: MouseEvent) => {

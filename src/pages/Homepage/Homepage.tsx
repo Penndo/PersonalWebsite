@@ -134,7 +134,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
             <path d="M12 5v14M5 12l7 7 7-7" stroke="rgba(255, 255, 255, 0.88)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </motion.div>
-        <span className="scroll-text">下滑，了解更多</span>
+        {/* <span className="scroll-text">下滑，了解更多</span> */}
       </motion.div>
     </section>
   );

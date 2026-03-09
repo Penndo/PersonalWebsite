@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components';
@@ -11,6 +11,10 @@ const PluginDetail: React.FC = () => {
   const navigate = useNavigate();
   const [plugin, setPlugin] = useState<PluginDetailType | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     const fetchPlugin = async () => {

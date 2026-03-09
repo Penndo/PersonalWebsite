@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Homepage, Products } from '@/pages';
 import { GradientBackground, DynamicParticles } from '@/components';
@@ -36,49 +36,48 @@ function App() {
     }
   }, [location.hash]);
 
+  const handleScroll = useCallback(() => {
+    const currentScrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    
+    if (!isScrolling) {
+      if (currentSection === 'home' && currentScrollY > 20) {
+        scrollToSection(productsRef.current, 'products');
+      }
+      else if (currentSection === 'products' && currentScrollY < windowHeight - 20) {
+        scrollToTop();
+      }
+    }
+  }, [isScrolling, currentSection]);
+
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
 
-    const handleScroll = () => {
+    const handleScrollDebounced = () => {
       const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       
       if (!isScrolling) {
-        // If we are currently at 'home' and scroll down slightly (e.g. > 10px), go to 'products'
-        if (currentSection === 'home' && currentScrollY > 10) {
-          scrollToSection(productsRef.current, 'products');
-        }
-        // If we are currently at 'products' and scroll up slightly (e.g. < full height - 10px), go to 'home'
-        // Note: products section starts at windowHeight roughly. So if we are above windowHeight - 10, go back.
-        // We use windowHeight * 0.9 as a safe threshold to detect intent to go back up
-        else if (currentSection === 'products' && currentScrollY < windowHeight - 10) {
-          scrollToTop();
-        }
-
-        // Debounce check for small scrolls (<= 10px) to snap back
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
-          if (!isScrolling) {
-            const currentY = window.scrollY;
-            // If at home and scrolled a tiny bit (<= 10px), snap back to top
-            if (currentSection === 'home' && currentY > 0 && currentY <= 10) {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-            // If at products and scrolled up a tiny bit (>= height - 10px), snap back to products
-            else if (currentSection === 'products' && currentY >= windowHeight - 10 && currentY < windowHeight) {
-              productsRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }
+          if (currentSection === 'home' && currentScrollY > 0 && currentScrollY <= 20) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+          else if (currentSection === 'products' && currentScrollY >= windowHeight - 20 && currentScrollY < windowHeight) {
+            productsRef.current?.scrollIntoView({ behavior: 'smooth' });
           }
         }, 100);
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScrollDebounced, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleScrollDebounced);
       clearTimeout(scrollTimeout);
     };
-  }, [isScrolling, currentSection]);
+  }, [handleScroll, isScrolling, currentSection]);
 
   return (
     <div className="app">

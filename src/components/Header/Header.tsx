@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import './Header.less';
 
 interface HeaderProps {
@@ -7,6 +8,17 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onLogoClick }) => {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    if (onLogoClick) {
+      onLogoClick();
+      return;
+    }
+    navigate('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <motion.header 
       className="header"
@@ -14,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ onLogoClick }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="header-logo" onClick={onLogoClick}>
+      <div className="header-logo" onClick={handleLogoClick}>
         <div className="logo-avatar">
           <img 
             src="https://api.dicebear.com/7.x/avataaars/svg?seed=Yeatfish" 
