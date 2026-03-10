@@ -1,8 +1,22 @@
 import axios from 'axios';
-import type { UserInfo, Project, ProjectDetail, Article, ArticleDetail, Plugin, PluginDetail } from '@/types';
-import { mockProjectDetail, mockArticleDetail, mockPluginDetail } from './mock';
+import type {
+  UserInfo,
+  Project,
+  ProjectDetail,
+  Article,
+  ArticleDetail,
+  Plugin,
+  PluginDetail,
+  TabType,
+} from '@/types';
+import {
+  mockProjectDetail,
+  mockArticleDetail,
+  mockPluginDetail,
+} from './mock';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,14 +27,27 @@ const api = axios.create({
 });
 
 export const userApi = {
-  getUserInfo: () => api.get<UserInfo>('/user/info'),
-  updateUserInfo: (data: Partial<UserInfo>) => api.put<UserInfo>('/user/info', data),
+  getUserInfo: () => api.get<UserInfo>('/user/profile'),
+  updateUserInfo: (data: Partial<UserInfo>) =>
+    api.put<UserInfo>('/user/profile', data),
+};
+
+export interface TabConfigDto {
+  key: TabType;
+  label: string;
+  order: number;
+  enabled: boolean;
+}
+
+export const tabsApi = {
+  getTabs: () => api.get<TabConfigDto[]>('/tabs'),
 };
 
 export const projectApi = {
   getProjects: () => api.get<Project[]>('/projects'),
   getProjectById: (id: string) => api.get<Project>(`/projects/${id}`),
-  getProjectDetail: (id: string) => api.get<ProjectDetail>(`/projects/${id}/detail`),
+  getProjectDetail: (id: string) =>
+    api.get<ProjectDetail>(`/projects/${id}`),
 };
 
 export const articleApi = {
@@ -28,8 +55,15 @@ export const articleApi = {
   getArticleById: (id: string) => api.get<Article>(`/articles/${id}`),
 };
 
-export const getArticleDetail = async (id: string): Promise<ArticleDetail> => {
-  if (import.meta.env.DEV || !import.meta.env.VITE_API_BASE_URL) {
+export const pluginApi = {
+  getPlugins: () => api.get<Plugin[]>('/plugins'),
+  getPluginById: (id: string) => api.get<Plugin>(`/plugins/${id}`),
+};
+
+export const getArticleDetail = async (
+  id: string,
+): Promise<ArticleDetail> => {
+  if (import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL) {
     const article = mockArticleDetail[id];
     if (!article) {
       throw new Error('Article not found');
@@ -41,7 +75,7 @@ export const getArticleDetail = async (id: string): Promise<ArticleDetail> => {
 };
 
 export const getPluginDetail = async (id: string): Promise<PluginDetail> => {
-  if (import.meta.env.DEV || !import.meta.env.VITE_API_BASE_URL) {
+  if (import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL) {
     const plugin = mockPluginDetail[id];
     if (!plugin) {
       throw new Error('Plugin not found');
@@ -52,13 +86,10 @@ export const getPluginDetail = async (id: string): Promise<PluginDetail> => {
   return response.data as PluginDetail;
 };
 
-export const pluginApi = {
-  getPlugins: () => api.get<Plugin[]>('/plugins'),
-  getPluginById: (id: string) => api.get<Plugin>(`/plugins/${id}`),
-};
-
-export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
-  if (import.meta.env.DEV || !import.meta.env.VITE_API_BASE_URL) {
+export const getProjectDetail = async (
+  id: string,
+): Promise<ProjectDetail> => {
+  if (import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL) {
     const project = mockProjectDetail[id];
     if (!project) {
       throw new Error('Project not found');

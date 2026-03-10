@@ -2,6 +2,8 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Homepage, Products } from '@/pages';
 import { GradientBackground, DynamicParticles } from '@/components';
+import { userApi } from '@/services/api';
+import type { UserInfo } from '@/types';
 import { mockUserInfo } from '@/services/mock';
 import './styles/global.less';
 
@@ -10,6 +12,7 @@ function App() {
   const location = useLocation();
   const [isScrolling, setIsScrolling] = useState(false);
   const [currentSection, setCurrentSection] = useState<'home' | 'products'>('home');
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   const scrollToSection = (element: HTMLElement | null, section: 'home' | 'products') => {
     if (isScrolling || !element) return;
@@ -35,6 +38,26 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [location.hash]);
+
+  useEffect(() => {
+    userApi
+      .getUserInfo()
+      .then((res) => {
+        const profile = res.data as any;
+        const mapped: UserInfo = {
+          name: profile.displayName ?? mockUserInfo.name,
+          profession: profile.introTitle ?? mockUserInfo.profession,
+          introduction: profile.introContent ?? mockUserInfo.introduction,
+          avatar: profile.avatarUrl ?? mockUserInfo.avatar,
+          age: mockUserInfo.age,
+          hobbies: mockUserInfo.hobbies,
+        };
+        setUserInfo(mapped);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch user info', err);
+      });
+  }, []);
 
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
@@ -79,12 +102,14 @@ function App() {
     };
   }, [handleScroll, isScrolling, currentSection]);
 
+  const effectiveUser = userInfo ?? mockUserInfo;
+
   return (
     <div className="app">
       <GradientBackground />
       <DynamicParticles />
       <Homepage 
-        userInfo={mockUserInfo} 
+        userInfo={effectiveUser} 
         onScrollDown={() => scrollToSection(productsRef.current, 'products')}
       />
       <div ref={productsRef}>

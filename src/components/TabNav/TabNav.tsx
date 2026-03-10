@@ -2,18 +2,18 @@ import { motion } from 'framer-motion';
 import type { TabType } from '@/types';
 import './TabNav.less';
 
+interface DynamicTab {
+  key: TabType;
+  label: string;
+}
+
 interface TabNavProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
+  tabs: DynamicTab[];
 }
 
-const tabs: { key: TabType; label: string }[] = [
-  { key: 'works', label: '作品' },
-  { key: 'articles', label: '文章' },
-  { key: 'plugins', label: '插件' },
-];
-
-const TabNav: React.FC<TabNavProps> = ({ activeTab, onTabChange }) => {
+const TabNav: React.FC<TabNavProps> = ({ activeTab, onTabChange, tabs }) => {
   return (
     <motion.nav 
       className="tab-nav"

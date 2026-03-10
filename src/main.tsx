@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.tsx';
-import { ProjectDetail, ArticleDetail, PluginDetail } from '@/pages';
+import { ProjectDetail, ArticleDetail, PluginDetail, Admin } from '@/pages';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -12,6 +12,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/project/:id" element={<ProjectDetail />} />
         <Route path="/article/:id" element={<ArticleDetail />} />
         <Route path="/plugin/:id" element={<PluginDetail />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

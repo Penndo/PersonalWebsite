@@ -23,32 +23,17 @@ const Products: React.FC = () => {
   const [articles] = useState<Article[]>(mockArticles);
   const [plugins] = useState<Plugin[]>(mockPlugins);
   const [loading, setLoading] = useState(false);
-  const [showNav, setShowNav] = useState(false);
+
+  const tabs = [
+    { key: 'works' as const, label: '作品' },
+    { key: 'articles' as const, label: '文章' },
+    { key: 'plugins' as const, label: '插件' },
+  ];
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     navigate(`#${tab}`, { replace: true });
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const windowHeight = window.innerHeight;
-      const scrollY = window.scrollY;
-      
-      // Show Nav when we are significantly into the products section
-      if (scrollY > windowHeight * 0.8) {
-        setShowNav(true);
-      } else {
-        setShowNav(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    // Trigger once on mount
-    handleScroll();
-    
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     const tab = getInitialTab(location.hash);
@@ -153,19 +138,9 @@ const Products: React.FC = () => {
     <section className="products">
       <Header />
       
-      <AnimatePresence>
-        {showNav && (
-          <motion.div 
-            className="products-header"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-          >
-            <TabNav activeTab={activeTab} onTabChange={handleTabChange} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="products-header">
+        <TabNav activeTab={activeTab} onTabChange={handleTabChange} tabs={tabs} />
+      </div>
 
       <div className="products-content">
         <AnimatePresence mode="wait">
