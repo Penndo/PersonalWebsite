@@ -1,17 +1,68 @@
-.admin-page {
+.admin-layout {
   min-height: 100vh;
   background: radial-gradient(circle at top, #1f2933, #020617);
   color: #f9fafb;
 }
 
-.admin-main {
-  max-width: 960px;
-  margin: 80px auto 40px;
+.admin-sider {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-right: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+.admin-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.admin-logo-text {
+  font-size: 18px;
+  color: #f9fafb;
+  font-weight: 600;
+}
+
+.admin-header {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3) !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 64px;
+}
+
+.admin-menu-trigger {
+  color: #f9fafb !important;
+  font-size: 18px;
+}
+
+.admin-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.admin-username {
+  color: #f9fafb;
+  font-weight: 500;
+}
+
+.admin-content {
   padding: 24px;
-  background: rgba(15, 23, 42, 0.9);
-  border-radius: 16px;
-  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(20px);
+  overflow: auto;
+}
+
+.admin-content-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.admin-page-title {
+  color: #f9fafb !important;
+  margin-bottom: 24px !important;
+  font-weight: 600 !important;
 }
 
 .admin-card {
@@ -25,6 +76,7 @@
 .admin-card .ant-card-head-title {
   color: #f9fafb !important;
   font-size: 18px !important;
+  font-weight: 600 !important;
 }
 
 .loading-container {
@@ -43,12 +95,13 @@
   background: rgba(15, 23, 42, 0.8) !important;
   border: 1px solid rgba(148, 163, 184, 0.3) !important;
   border-radius: 12px !important;
-  margin-bottom: 12px !important;
+  margin-bottom: 16px !important;
 }
 
 /* 覆盖 antd 表单样式 */
 .ant-form-item-label > label {
   color: #e5e7eb !important;
+  font-weight: 500 !important;
 }
 
 .ant-input,
@@ -58,6 +111,14 @@
   border: 1px solid rgba(148, 163, 184, 0.4) !important;
   border-radius: 8px !important;
   color: #f9fafb !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-input:focus,
+.ant-input-number:focus,
+.ant-input-textarea:focus {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2) !important;
 }
 
 .ant-input::placeholder,
@@ -71,10 +132,14 @@
   border-radius: 999px !important;
   color: #111827 !important;
   font-weight: 500 !important;
+  padding: 8px 24px !important;
+  transition: all 0.3s ease !important;
 }
 
 .ant-btn-primary:hover {
   opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4) !important;
 }
 
 .ant-divider {
@@ -89,6 +154,66 @@
 
 .ant-switch-checked {
   background-color: #fbbf24 !important;
+}
+
+/* 覆盖 antd Menu 样式 */
+.ant-menu-dark {
+  background: transparent !important;
+}
+
+.ant-menu-dark .ant-menu-item {
+  color: rgba(249, 250, 251, 0.8) !important;
+  margin: 0 8px !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-menu-dark .ant-menu-item:hover {
+  background-color: rgba(251, 191, 36, 0.2) !important;
+  color: #f9fafb !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background: linear-gradient(135deg, #fbbf24, #fb923c) !important;
+  color: #111827 !important;
+  font-weight: 500 !important;
+}
+
+/* 覆盖 antd Avatar 样式 */
+.ant-avatar {
+  background-color: #fbbf24 !important;
+  color: #111827 !important;
+  font-weight: 500 !important;
+}
+
+/* 覆盖 antd Badge 样式 */
+.ant-badge-dot {
+  background-color: #fbbf24 !important;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.9) !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .admin-content {
+    padding: 16px;
+  }
+  
+  .admin-header {
+    padding: 0 16px;
+  }
+  
+  .admin-logo {
+    padding: 0 16px;
+  }
+  
+  .admin-card {
+    margin-bottom: 16px !important;
+  }
+  
+  .admin-tab-item {
+    margin-bottom: 12px !important;
+  }
 }
 
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Header } from '@/components';
 import { tabsApi, userApi } from '@/services/api';
 import type { UserInfo, TabType } from '@/types';
 import {
@@ -12,8 +11,28 @@ import {
   Divider,
   message,
   Spin,
+  Layout,
+  Menu,
+  Avatar,
+  Badge,
+  Tooltip,
+  Typography,
+  Space,
 } from 'antd';
+import {
+  UserOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  HomeOutlined,
+  SettingOutlined,
+  BarChartOutlined,
+  UserSwitchOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons';
 import './Admin.less';
+
+const { Header, Sider, Content } = Layout;
+const { Title, Text } = Typography;
 
 interface TabFormItem {
   key: TabType;
@@ -27,6 +46,7 @@ const Admin: React.FC = () => {
   const [tabs, setTabs] = useState<TabFormItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,131 +119,245 @@ const Admin: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="admin-page">
-        <Header />
-        <main className="admin-main">
-          <div className="loading-container">
-            <Spin size="large" tip="加载中..." />
+      <Layout className="admin-layout">
+        <Sider trigger={null} collapsible collapsed={collapsed} className="admin-sider">
+          <div className="admin-logo">
+            <Text strong className="admin-logo-text">后台管理</Text>
           </div>
-        </main>
-      </div>
+          <Menu
+            theme="dark"
+            mode="inline"
+            defaultSelectedKeys={['1']}
+            items={[
+              {
+                key: '1',
+                icon: <HomeOutlined />,
+                label: '首页设置',
+              },
+              {
+                key: '2',
+                icon: <SettingOutlined />,
+                label: '系统配置',
+              },
+              {
+                key: '3',
+                icon: <BarChartOutlined />,
+                label: '数据统计',
+              },
+              {
+                key: '4',
+                icon: <UserSwitchOutlined />,
+                label: '用户管理',
+              },
+            ]}
+          />
+        </Sider>
+        <Layout>
+          <Header className="admin-header">
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              className="admin-menu-trigger"
+            />
+            <div className="admin-header-right">
+              <Space size="middle">
+                <Badge dot={true}>
+                  <Tooltip title="消息通知">
+                    <Button type="text" icon={<UserOutlined />} />
+                  </Tooltip>
+                </Badge>
+                <Avatar size="small" icon={<UserOutlined />} />
+                <Text className="admin-username">管理员</Text>
+                <Tooltip title="退出登录">
+                  <Button type="text" icon={<LogoutOutlined />} />
+                </Tooltip>
+              </Space>
+            </div>
+          </Header>
+          <Content className="admin-content">
+            <div className="loading-container">
+              <Spin size="large" tip="加载中..." />
+            </div>
+          </Content>
+        </Layout>
+      </Layout>
     );
   }
 
   return (
-    <div className="admin-page">
-      <Header />
-      <main className="admin-main">
-        <Card 
-          title="首页用户信息" 
-          className="admin-card"
-          bordered={false}
-        >
-          {userInfo && (
-            <Form layout="vertical">
-              <Form.Item label="显示名称">
-                <Input
-                  value={userInfo.name}
-                  onChange={(e) => handleUserChange('name', e.target.value)}
-                  placeholder="请输入显示名称"
-                />
-              </Form.Item>
-              <Form.Item label="职业 / 角色">
-                <Input
-                  value={userInfo.profession}
-                  onChange={(e) => handleUserChange('profession', e.target.value)}
-                  placeholder="请输入职业或角色"
-                />
-              </Form.Item>
-              <Form.Item label="个人介绍">
-                <Input.TextArea
-                  value={userInfo.introduction}
-                  onChange={(e) => handleUserChange('introduction', e.target.value)}
-                  placeholder="请输入个人介绍"
-                  rows={4}
-                />
-              </Form.Item>
-              <Form.Item>
-                <Button 
-                  type="primary" 
-                  onClick={handleSaveUser}
-                  loading={saving}
-                >
-                  保存用户信息
-                </Button>
-              </Form.Item>
-            </Form>
-          )}
-        </Card>
-
-        <Divider />
-
-        <Card 
-          title="Tab 导航配置" 
-          className="admin-card"
-          bordered={false}
-        >
-          <div className="admin-tabs-list">
-            {tabs.map((tab, index) => (
-              <Card 
-                key={tab.key} 
-                className="admin-tab-item"
-                size="small"
-                style={{ marginBottom: 16 }}
-              >
-                <Form layout="horizontal">
-                  <Form.Item label="标签文案" style={{ flex: 1, marginRight: 16 }}>
+    <Layout className="admin-layout">
+      <Sider trigger={null} collapsible collapsed={collapsed} className="admin-sider">
+        <div className="admin-logo">
+          <Text strong className="admin-logo-text">后台管理</Text>
+        </div>
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={['1']}
+          items={[
+            {
+              key: '1',
+              icon: <HomeOutlined />,
+              label: '首页设置',
+            },
+            {
+              key: '2',
+              icon: <SettingOutlined />,
+              label: '系统配置',
+            },
+            {
+              key: '3',
+              icon: <BarChartOutlined />,
+              label: '数据统计',
+            },
+            {
+              key: '4',
+              icon: <UserSwitchOutlined />,
+              label: '用户管理',
+            },
+          ]}
+        />
+      </Sider>
+      <Layout>
+        <Header className="admin-header">
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="admin-menu-trigger"
+          />
+          <div className="admin-header-right">
+            <Space size="middle">
+              <Badge dot={true}>
+                <Tooltip title="消息通知">
+                  <Button type="text" icon={<UserOutlined />} />
+                </Tooltip>
+              </Badge>
+              <Avatar size="small" icon={<UserOutlined />} />
+              <Text className="admin-username">管理员</Text>
+              <Tooltip title="退出登录">
+                <Button type="text" icon={<LogoutOutlined />} />
+              </Tooltip>
+            </Space>
+          </div>
+        </Header>
+        <Content className="admin-content">
+          <div className="admin-content-inner">
+            <Title level={4} className="admin-page-title">首页设置</Title>
+            
+            <Card 
+              title="用户信息" 
+              className="admin-card"
+              bordered={false}
+              style={{ marginBottom: 24 }}
+            >
+              {userInfo && (
+                <Form layout="vertical">
+                  <Form.Item label="显示名称">
                     <Input
-                      value={tab.label}
-                      onChange={(e) =>
-                        handleTabChange(
-                          index,
-                          'label',
-                          e.target.value,
-                        )
-                      }
-                      placeholder="请输入标签文案"
+                      value={userInfo.name}
+                      onChange={(e) => handleUserChange('name', e.target.value)}
+                      placeholder="请输入显示名称"
                     />
                   </Form.Item>
-                  <Form.Item label="排序" style={{ width: 120, marginRight: 16 }}>
-                    <InputNumber
-                      value={tab.order}
-                      onChange={(value) =>
-                        handleTabChange(
-                          index,
-                          'order',
-                          value || 0,
-                        )
-                      }
-                      min={0}
+                  <Form.Item label="职业 / 角色">
+                    <Input
+                      value={userInfo.profession}
+                      onChange={(e) => handleUserChange('profession', e.target.value)}
+                      placeholder="请输入职业或角色"
                     />
                   </Form.Item>
-                  <Form.Item label="启用" style={{ width: 100 }}>
-                    <Switch
-                      checked={tab.enabled}
-                      onChange={(checked) =>
-                        handleTabChange(
-                          index,
-                          'enabled',
-                          checked,
-                        )
-                      }
+                  <Form.Item label="个人介绍">
+                    <Input.TextArea
+                      value={userInfo.introduction}
+                      onChange={(e) => handleUserChange('introduction', e.target.value)}
+                      placeholder="请输入个人介绍"
+                      rows={4}
                     />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button 
+                      type="primary" 
+                      onClick={handleSaveUser}
+                      loading={saving}
+                    >
+                      保存用户信息
+                    </Button>
                   </Form.Item>
                 </Form>
-              </Card>
-            ))}
+              )}
+            </Card>
+
+            <Card 
+              title="Tab 导航配置" 
+              className="admin-card"
+              bordered={false}
+            >
+              <div className="admin-tabs-list">
+                {tabs.map((tab, index) => (
+                  <Card 
+                    key={tab.key} 
+                    className="admin-tab-item"
+                    size="small"
+                    style={{ marginBottom: 16 }}
+                    bordered
+                  >
+                    <Form layout="horizontal">
+                      <Form.Item label="标签文案" style={{ flex: 1, marginRight: 16 }}>
+                        <Input
+                          value={tab.label}
+                          onChange={(e) =>
+                            handleTabChange(
+                              index,
+                              'label',
+                              e.target.value,
+                            )
+                          }
+                          placeholder="请输入标签文案"
+                        />
+                      </Form.Item>
+                      <Form.Item label="排序" style={{ width: 120, marginRight: 16 }}>
+                        <InputNumber
+                          value={tab.order}
+                          onChange={(value) =>
+                            handleTabChange(
+                              index,
+                              'order',
+                              value || 0,
+                            )
+                          }
+                          min={0}
+                        />
+                      </Form.Item>
+                      <Form.Item label="启用" style={{ width: 100 }}>
+                        <Switch
+                          checked={tab.enabled}
+                          onChange={(checked) =>
+                            handleTabChange(
+                              index,
+                              'enabled',
+                              checked,
+                            )
+                          }
+                        />
+                      </Form.Item>
+                    </Form>
+                  </Card>
+                ))}
+              </div>
+              <Button 
+                type="primary" 
+                onClick={handleSaveTabs}
+                loading={saving}
+              >
+                保存 Tab 配置
+              </Button>
+            </Card>
           </div>
-          <Button 
-            type="primary" 
-            onClick={handleSaveTabs}
-            loading={saving}
-          >
-            保存 Tab 配置
-          </Button>
-        </Card>
-      </main>
-    </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 
