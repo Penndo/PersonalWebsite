@@ -42,7 +42,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
           >
             <span className="tag">{userInfo.profession} 💼</span>
             <span className="tag">{userInfo.age} 🌍</span>
-            {userInfo.hobbies.map((hobby, index) => (
+            {(userInfo.hobbies ?? []).map((hobby, index) => (
               <span key={index} className="tag">{hobby} 🏀</span>
             ))}
           </motion.div>

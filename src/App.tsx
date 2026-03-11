@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Homepage, Products } from '@/pages';
 import { GradientBackground, DynamicParticles } from '@/components';
@@ -22,59 +22,77 @@ function App() {
     setTimeout(() => setIsScrolling(false), 800);
   };
 
-  const scrollToTop = () => {
-    if (isScrolling) return;
-    setIsScrolling(true);
-    setCurrentSection('home');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => setIsScrolling(false), 800);
-  };
-
   useEffect(() => {
     if (location.hash && productsRef.current) {
+      const element = productsRef.current;
       const timer = setTimeout(() => {
-        scrollToSection(productsRef.current, 'products');
+        if (isScrolling) return;
+        setIsScrolling(true);
+        setCurrentSection('products');
+        element.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => setIsScrolling(false), 800);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [location.hash]);
+  }, [location.hash, isScrolling]);
 
   useEffect(() => {
     userApi
       .getUserInfo()
       .then((res) => {
-        const profile = res.data as any;
-        const mapped: UserInfo = {
-          name: profile.displayName ?? mockUserInfo.name,
-          profession: profile.introTitle ?? mockUserInfo.profession,
-          introduction: profile.introContent ?? mockUserInfo.introduction,
-          avatar: profile.avatarUrl ?? mockUserInfo.avatar,
-          age: mockUserInfo.age,
-          hobbies: mockUserInfo.hobbies,
+        const raw = res.data as Partial<UserInfo>;
+        const normalized: UserInfo = {
+          ...mockUserInfo,
+          ...raw,
+          name: raw.name ?? mockUserInfo.name,
+          profession: raw.profession ?? mockUserInfo.profession,
+          introduction: raw.introduction ?? mockUserInfo.introduction,
+          avatar: raw.avatar ?? mockUserInfo.avatar,
+          age: typeof raw.age === 'number' ? raw.age : mockUserInfo.age,
+          hobbies: Array.isArray(raw.hobbies) ? raw.hobbies : mockUserInfo.hobbies,
         };
-        setUserInfo(mapped);
+        setUserInfo(normalized);
       })
       .catch((err) => {
         console.error('Failed to fetch user info', err);
+        setUserInfo(mockUserInfo);
       });
   }, []);
 
-  const handleScroll = useCallback(() => {
-    const currentScrollY = window.scrollY;
-    const windowHeight = window.innerHeight;
-    
-    if (!isScrolling) {
-      if (currentSection === 'home' && currentScrollY > 20) {
-        scrollToSection(productsRef.current, 'products');
-      }
-      else if (currentSection === 'products' && currentScrollY < windowHeight - 20) {
-        scrollToTop();
-      }
-    }
-  }, [isScrolling, currentSection]);
-
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
+
+    const scrollToProducts = () => {
+      if (isScrolling || !productsRef.current) return;
+      setIsScrolling(true);
+      setCurrentSection('products');
+      productsRef.current.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => setIsScrolling(false), 800);
+    };
+
+    const scrollToHome = () => {
+      if (isScrolling) return;
+      setIsScrolling(true);
+      setCurrentSection('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => setIsScrolling(false), 800);
+    };
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+
+      if (!isScrolling) {
+        if (currentSection === 'home' && currentScrollY > 20) {
+          scrollToProducts();
+        } else if (
+          currentSection === 'products' &&
+          currentScrollY < windowHeight - 20
+        ) {
+          scrollToHome();
+        }
+      }
+    };
 
     const handleScrollDebounced = () => {
       const currentScrollY = window.scrollY;
@@ -100,7 +118,7 @@ function App() {
       window.removeEventListener('scroll', handleScrollDebounced);
       clearTimeout(scrollTimeout);
     };
-  }, [handleScroll, isScrolling, currentSection]);
+  }, [isScrolling, currentSection]);
 
   const effectiveUser = userInfo ?? mockUserInfo;
 

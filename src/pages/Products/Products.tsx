@@ -18,7 +18,7 @@ const getInitialTab = (hash: string): TabType => {
 const Products: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<TabType>(() => getInitialTab(location.hash));
+  const activeTab = getInitialTab(location.hash);
   const [projects] = useState<Project[]>(mockProjects);
   const [articles] = useState<Article[]>(mockArticles);
   const [plugins] = useState<Plugin[]>(mockPlugins);
@@ -31,17 +31,12 @@ const Products: React.FC = () => {
   ];
 
   const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
+    if (tab === activeTab) return;
+    setLoading(true);
     navigate(`#${tab}`, { replace: true });
   };
 
   useEffect(() => {
-    const tab = getInitialTab(location.hash);
-    setActiveTab(tab);
-  }, [location.hash]);
-
-  useEffect(() => {
-    // Avoid calling setLoading(true) directly to prevent cascading renders
     const timer = setTimeout(() => {
       setLoading(false);
     }, 300);
