@@ -80,8 +80,35 @@ export const getArticleDetail = async (
     }
     return article;
   }
-  const response = await articleApi.getArticleById(id);
-  return response.data as ArticleDetail;
+  try {
+    const response = await articleApi.getArticleById(id);
+    // 转换后端数据为前端需要的格式
+    const articleData = response.data;
+    return {
+      id: articleData.id.toString(),
+      title: articleData.title,
+      description: articleData.summary,
+      cover: articleData.coverUrl || '',
+      date: articleData.createdAt ? new Date(articleData.createdAt).toISOString().split('T')[0] : '',
+      tags: articleData.tags || [],
+      content: articleData.content || '',
+      readingTime: 5, // 默认值
+      views: 0, // 默认值
+      author: {
+        name: 'Yeatfish',
+        avatar: '',
+        bio: 'UI/UX设计师',
+      },
+    };
+  } catch (error) {
+    console.error('Failed to fetch article detail:', error);
+    // 如果真实 API 失败，尝试使用 mock 数据
+    const article = mockArticleDetail[id];
+    if (article) {
+      return article;
+    }
+    throw new Error('Article not found');
+  }
 };
 
 export const getPluginDetail = async (id: string): Promise<PluginDetail> => {
@@ -92,8 +119,35 @@ export const getPluginDetail = async (id: string): Promise<PluginDetail> => {
     }
     return plugin;
   }
-  const response = await pluginApi.getPluginById(id);
-  return response.data as PluginDetail;
+  try {
+    const response = await pluginApi.getPluginById(id);
+    // 转换后端数据为前端需要的格式
+    const pluginData = response.data;
+    return {
+      id: pluginData.id.toString(),
+      title: pluginData.title,
+      description: pluginData.summary,
+      cover: pluginData.coverUrl || '',
+      version: pluginData.version || '1.0.0',
+      downloads: 0, // 默认值
+      rating: 5, // 默认值
+      tags: pluginData.tags || [],
+      features: [], // 默认值
+      screenshots: [], // 默认值
+      author: {
+        name: 'Yeatfish',
+        avatar: '',
+      },
+    };
+  } catch (error) {
+    console.error('Failed to fetch plugin detail:', error);
+    // 如果真实 API 失败，尝试使用 mock 数据
+    const plugin = mockPluginDetail[id];
+    if (plugin) {
+      return plugin;
+    }
+    throw new Error('Plugin not found');
+  }
 };
 
 export const getProjectDetail = async (
@@ -106,8 +160,33 @@ export const getProjectDetail = async (
     }
     return project;
   }
-  const response = await projectApi.getProjectDetail(id);
-  return response.data;
+  try {
+    const response = await projectApi.getProjectDetail(id);
+    // 转换后端数据为前端需要的格式
+    const projectData = response.data;
+    return {
+      id: projectData.id.toString(),
+      title: projectData.title,
+      summary: projectData.summary,
+      background: projectData.content || '',
+      designThinking: '',
+      images: [],
+      tags: projectData.tags || [],
+      achievements: [],
+      client: '',
+      year: '',
+      role: '',
+      tools: [],
+    };
+  } catch (error) {
+    console.error('Failed to fetch project detail:', error);
+    // 如果真实 API 失败，尝试使用 mock 数据
+    const project = mockProjectDetail[id];
+    if (project) {
+      return project;
+    }
+    throw new Error('Project not found');
+  }
 };
 
 export default api;
