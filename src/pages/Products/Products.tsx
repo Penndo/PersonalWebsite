@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header, TabNav, Card } from '@/components';
 import { mockProjects, mockArticles, mockPlugins } from '@/services/mock';
+import { tabsApi } from '@/services/api';
 import type { TabType, Project, Article, Plugin } from '@/types';
 import './Products.less';
 
@@ -23,12 +24,23 @@ const Products: React.FC = () => {
   const [articles] = useState<Article[]>(mockArticles);
   const [plugins] = useState<Plugin[]>(mockPlugins);
   const [loading, setLoading] = useState(false);
-
-  const tabs = [
+  const [tabs, setTabs] = useState([
     { key: 'works' as const, label: '作品' },
     { key: 'articles' as const, label: '文章' },
     { key: 'plugins' as const, label: '插件' },
-  ];
+  ]);
+
+  useEffect(() => {
+    tabsApi.getTabs()
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setTabs(res.data);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch tabs', err);
+      });
+  }, []);
 
   const handleTabChange = (tab: TabType) => {
     if (tab === activeTab) return;

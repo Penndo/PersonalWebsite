@@ -41,6 +41,7 @@ export interface TabConfigDto {
 
 export const tabsApi = {
   getTabs: () => api.get<TabConfigDto[]>('/tabs'),
+  updateTabs: (data: TabConfigDto[]) => api.put<TabConfigDto[]>('/tabs', data),
 };
 
 export const projectApi = {
@@ -48,16 +49,25 @@ export const projectApi = {
   getProjectById: (id: string) => api.get<Project>(`/projects/${id}`),
   getProjectDetail: (id: string) =>
     api.get<ProjectDetail>(`/projects/${id}`),
+  createProject: (data: Partial<Project>) => api.post<Project>('/projects', data),
+  updateProject: (id: string, data: Partial<Project>) => api.put<Project>(`/projects/${id}`, data),
+  deleteProject: (id: string) => api.delete(`/projects/${id}`),
 };
 
 export const articleApi = {
   getArticles: () => api.get<Article[]>('/articles'),
   getArticleById: (id: string) => api.get<Article>(`/articles/${id}`),
+  createArticle: (data: Partial<Article>) => api.post<Article>('/articles', data),
+  updateArticle: (id: string, data: Partial<Article>) => api.put<Article>(`/articles/${id}`, data),
+  deleteArticle: (id: string) => api.delete(`/articles/${id}`),
 };
 
 export const pluginApi = {
   getPlugins: () => api.get<Plugin[]>('/plugins'),
   getPluginById: (id: string) => api.get<Plugin>(`/plugins/${id}`),
+  createPlugin: (data: Partial<Plugin>) => api.post<Plugin>('/plugins', data),
+  updatePlugin: (id: string, data: Partial<Plugin>) => api.put<Plugin>(`/plugins/${id}`, data),
+  deletePlugin: (id: string) => api.delete(`/plugins/${id}`),
 };
 
 export const getArticleDetail = async (
