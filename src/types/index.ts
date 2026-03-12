@@ -10,8 +10,15 @@ export interface UserInfo {
 export interface Project {
   id: string;
   title: string;
-  description: string;
-  cover: string;
+  routeId: string;
+  summary: string;
+  content?: string;
+  coverUrl?: string;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  description?: string;
+  cover?: string;
   link?: string;
 }
 
@@ -34,9 +41,16 @@ export interface ProjectDetail {
 export interface Article {
   id: string;
   title: string;
-  description: string;
-  cover: string;
-  date: string;
+  routeId: string;
+  summary: string;
+  content?: string;
+  coverUrl?: string;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  description?: string;
+  cover?: string;
+  date?: string;
   link?: string;
 }
 
@@ -61,8 +75,18 @@ export interface ArticleDetail {
 export interface Plugin {
   id: string;
   title: string;
-  description: string;
-  cover: string;
+  routeId: string;
+  summary: string;
+  content?: string;
+  coverUrl?: string;
+  repositoryUrl?: string;
+  downloadUrl?: string;
+  version?: string;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  description?: string;
+  cover?: string;
   link?: string;
 }
 

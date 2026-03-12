@@ -161,7 +161,7 @@ export const getProjectDetail = async (
     return project;
   }
   try {
-    const response = await projectApi.getProjectDetail(id);
+    const response = await projectApi.getProjectById(id);
     // 转换后端数据为前端需要的格式
     const projectData = response.data;
     return {

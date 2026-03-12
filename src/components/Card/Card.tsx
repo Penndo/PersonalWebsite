@@ -3,7 +3,7 @@ import './Card.less';
 
 interface CardProps {
   title: string;
-  description: string;
+  description?: string;
   cover?: string;
   variant?: 'vertical' | 'horizontal';
   onClick?: () => void;
