@@ -67,7 +67,7 @@ const UserSettings: React.FC = () => {
     <>
       <Title level={4} className="admin-page-title">用户设置</Title>
 
-      <Card title="用户信息" className="admin-card" bordered={false}>
+      <Card title="用户信息" className="admin-card" variant="borderless">
         {userInfo && (
           <Form layout="vertical">
             <Form.Item label="姓名">

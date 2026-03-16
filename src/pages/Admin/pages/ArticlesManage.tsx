@@ -162,7 +162,7 @@ const ArticlesManage: React.FC = () => {
 
       <Card
         className="admin-card"
-        bordered={false}
+        variant="borderless"
         extra={
           <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
             新增文章

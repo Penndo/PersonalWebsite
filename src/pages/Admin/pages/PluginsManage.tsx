@@ -12,7 +12,7 @@ import {
   Popconfirm,
   Modal,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { pluginApi } from '@/services/api';
 import type { Plugin } from '@/types';
 
@@ -168,9 +168,9 @@ const PluginsManage: React.FC = () => {
 
       <Card
         className="admin-card"
-        bordered={false}
+        variant="borderless"
         extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
+          <Button type="primary" onClick={() => openModal()}>
             新增插件
           </Button>
         }

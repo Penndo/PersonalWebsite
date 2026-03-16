@@ -77,7 +77,7 @@ const TabsSettings: React.FC = () => {
     <>
       <Title level={4} className="admin-page-title">导航配置</Title>
 
-      <Card title="Tab 导航配置" className="admin-card" bordered={false}>
+      <Card title="Tab 导航配置" className="admin-card" variant="borderless">
         <div className="admin-tabs-list">
           {tabs.length === 0 ? (
             <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -85,7 +85,7 @@ const TabsSettings: React.FC = () => {
             </div>
           ) : (
             tabs.map((tab, index) => (
-              <Card key={tab.key} className="admin-tab-item" size="small" style={{ marginBottom: 16 }} bordered>
+              <Card key={tab.key} className="admin-tab-item" size="small" style={{ marginBottom: 16 }} variant="outlined">
                 <Form layout="vertical">
                   <Form.Item label="Key" style={{ marginBottom: 8 }}>
                     <Input value={tab.key} disabled />

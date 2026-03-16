@@ -1,13 +1,16 @@
+// 深色模式
+@import "../../styles/admin-variables.less";
+
+// 深色模式
 .admin-layout {
   min-height: 100vh;
-  // background: radial-gradient(circle at top, #1f2933, #020617);
-  background-color: #111827;
-  color: #f9fafb;
+  background-color: @admin-dark-bg-primary;
+  color: @admin-dark-text-primary;
 }
 
-.admin-sider {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border-right: 1px solid rgba(148, 163, 184, 0.3) !important;
+.admin-layout .admin-sider {
+  background: @admin-dark-bg-sider;
+  border-right: 1px solid @admin-dark-border;
 }
 
 .admin-logo {
@@ -16,18 +19,18 @@
   align-items: center;
   justify-content: center;
   padding: 0 24px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+  border-bottom: 1px solid @admin-dark-border;
 }
 
 .admin-logo-text {
   font-size: 18px;
-  color: #f9fafb;
+  color: @admin-dark-text-primary;
   font-weight: 600;
 }
 
-.admin-header {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.3) !important;
+.admin-layout .admin-header {
+  background: @admin-dark-bg-sider;
+  border-bottom: 1px solid @admin-dark-border;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -35,8 +38,8 @@
   height: 64px;
 }
 
-.admin-menu-trigger {
-  color: #f9fafb !important;
+.admin-layout .admin-menu-trigger {
+  color: @admin-dark-text-primary;
   font-size: 18px;
 }
 
@@ -46,13 +49,15 @@
 }
 
 .admin-username {
-  color: #f9fafb;
+  color: @admin-dark-text-primary;
   font-weight: 500;
 }
 
 .admin-content {
   padding: 24px;
   overflow: auto;
+  background: @admin-dark-bg-secondary;
+  min-height: calc(100vh - 64px);
 }
 
 .admin-content-inner {
@@ -60,24 +65,24 @@
   margin: 0 auto;
 }
 
-.admin-page-title {
-  color: #f9fafb !important;
-  margin-bottom: 24px !important;
-  font-weight: 600 !important;
+.admin-layout .admin-page-title {
+  color: @admin-dark-text-primary;
+  margin-bottom: 24px;
+  font-weight: 600;
 }
 
-.admin-card {
-  background: rgba(15, 23, 42, 0.8) !important;
-  border: 1px solid rgba(148, 163, 184, 0.3) !important;
-  border-radius: 12px !important;
-  margin-bottom: 24px !important;
-  color: #f9fafb !important;
+.admin-layout .admin-card {
+  background: @admin-dark-bg-card;
+  border: 1px solid @admin-dark-border;
+  border-radius: @admin-border-radius;
+  margin-bottom: 24px;
+  color: @admin-dark-text-primary;
 }
 
-.admin-card .ant-card-head-title {
-  color: #f9fafb !important;
-  font-size: 18px !important;
-  font-weight: 600 !important;
+.admin-layout .admin-card .ant-card-head-title {
+  color: @admin-dark-text-primary;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .loading-container {
@@ -85,135 +90,621 @@
   justify-content: center;
   align-items: center;
   min-height: 500px;
-  color: #f9fafb;
+  color: @admin-dark-text-primary;
 }
 
 .admin-tabs-list {
   margin-bottom: 16px;
 }
 
-.admin-tab-item {
-  background: rgba(15, 23, 42, 0.8) !important;
-  border: 1px solid rgba(148, 163, 184, 0.3) !important;
-  border-radius: 12px !important;
-  margin-bottom: 16px !important;
+.admin-layout .admin-tab-item {
+  background: @admin-dark-bg-card;
+  border: 1px solid @admin-dark-border;
+  border-radius: @admin-border-radius;
+  margin-bottom: 16px;
+}
+
+// 浅色模式
+.admin-layout.light {
+  background-color: @admin-light-bg-primary;
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .admin-sider {
+  background: @admin-light-bg-sider;
+  border-right: 1px solid @admin-light-border;
+}
+
+.admin-layout.light .admin-logo {
+  border-bottom: 1px solid @admin-light-border;
+}
+
+.admin-layout.light .admin-logo-text {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .admin-header {
+  background: @admin-light-bg-sider;
+  border-bottom: 1px solid @admin-light-border;
+}
+
+.admin-layout.light .admin-menu-trigger {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .admin-username {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .admin-content {
+  background: @admin-light-bg-secondary;
+}
+
+.admin-layout.light .admin-page-title {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .admin-card {
+  background: @admin-light-bg-card;
+  border: 1px solid @admin-light-border;
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .admin-card .ant-card-head-title {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .loading-container {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .admin-tab-item {
+  background: @admin-light-bg-card;
+  border: 1px solid @admin-light-border;
+}
+
+// 表单样式 - 浅色模式
+.admin-layout.light .ant-form-item-label > label {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .ant-input,
+.admin-layout.light .ant-input-number,
+.admin-layout.light .ant-input-textarea {
+  background: @admin-light-bg-card;
+  border: 1px solid @admin-light-border;
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .ant-input:hover,
+.admin-layout.light .ant-input-number:hover,
+.admin-layout.light .ant-input-textarea:hover {
+  border-color: @admin-light-primary-light;
+}
+
+.admin-layout.light .ant-input:focus,
+.admin-layout.light .ant-input-number:focus,
+.admin-layout.light .ant-input-number-focused,
+.admin-layout.light .ant-input-textarea:focus {
+  border-color: @admin-light-primary-color;
+  box-shadow: 0 0 0 2px @admin-light-shadow-focus;
+}
+
+.admin-layout.light .ant-input::placeholder,
+.admin-layout.light .ant-input-textarea::placeholder {
+  color: @admin-light-placeholder;
+}
+
+// 表格样式 - 浅色模式
+.admin-layout.light .ant-table-thead > tr > th {
+  background: @admin-light-bg-primary;
+  border-bottom: 1px solid @admin-light-border;
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .ant-table-tbody > tr > td {
+  background: @admin-light-bg-card;
+  border-bottom: 1px solid @admin-light-border;
+  color: @admin-light-text-secondary;
+}
+
+.admin-layout.light .ant-table-tbody > tr:hover > td {
+  background: @admin-light-table-row-hover;
+}
+
+.admin-layout.light .ant-table-pagination.ant-pagination {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .ant-pagination-item {
+  background: @admin-light-bg-card;
+  border-color: @admin-light-border;
+  color: @admin-light-text-secondary;
+}
+
+.admin-layout.light .ant-pagination-item a {
+  color: @admin-light-text-secondary;
+}
+
+.admin-layout.light .ant-pagination-prev,
+.admin-layout.light .ant-pagination-next {
+  background: @admin-light-bg-card;
+  border-color: @admin-light-border;
+  color: @admin-light-text-secondary;
+}
+
+.admin-layout.light .ant-pagination-disabled {
+  background: @admin-light-bg-secondary;
+  border-color: @admin-light-border;
+  color: @admin-light-placeholder;
+}
+
+// 弹窗样式 - 浅色模式
+.admin-layout.light .ant-modal-content {
+  background: @admin-light-bg-card;
+  border: 1px solid @admin-light-border;
+}
+
+.admin-layout.light .ant-modal-header {
+  border-bottom: 1px solid @admin-light-border;
+}
+
+.admin-layout.light .ant-modal-title {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .ant-modal-body {
+  color: @admin-light-text-secondary;
+}
+
+.admin-layout.light .ant-modal-footer {
+  border-top: 1px solid @admin-light-border;
+}
+
+.admin-layout.light .ant-modal-close-x {
+  color: @admin-light-text-secondary;
+}
+
+.admin-layout.light .ant-modal-close-x:hover {
+  color: @admin-light-text-primary;
+}
+
+// 气泡确认框样式 - 浅色模式
+.admin-layout.light .ant-popover-inner {
+  background: @admin-light-bg-card;
+  border: 1px solid @admin-light-border;
+}
+
+.admin-layout.light .ant-popconfirm-title {
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .ant-popconfirm-description {
+  color: @admin-light-text-tertiary;
+}
+
+.admin-layout.light .ant-btn-default {
+  background: @admin-light-bg-secondary;
+  border: 1px solid @admin-light-border;
+  color: @admin-light-text-secondary;
+}
+
+.admin-layout.light .ant-btn-default:hover {
+  border-color: @admin-light-primary-color;
+  color: @admin-light-text-primary;
+}
+
+// 菜单样式 - 浅色模式
+.admin-layout.light .ant-menu-dark {
+  background: transparent;
+}
+
+.admin-layout.light .ant-menu-dark .ant-menu-item {
+  color: rgba(17, 24, 39, 0.8);
+}
+
+.admin-layout.light .ant-menu-dark .ant-menu-item:hover {
+  background-color: @admin-light-primary-hover;
+  color: @admin-light-text-primary;
+}
+
+.admin-layout.light .ant-menu-dark .ant-menu-item-selected {
+  background: linear-gradient(135deg, @admin-light-primary-gradient-start, @admin-light-primary-gradient-end);
+  color: @admin-light-bg-card;
+}
+
+// 按钮样式 - 浅色模式
+.admin-layout.light .ant-btn-primary {
+  background: linear-gradient(135deg, @admin-light-primary-gradient-start, @admin-light-primary-gradient-end);
+  color: @admin-light-bg-card;
+}
+
+.admin-layout.light .ant-btn-primary:hover {
+  // box-shadow: 0 4px 12px @admin-light-shadow-primary;
+}
+
+// 开关样式 - 浅色模式
+.admin-layout.light .ant-switch {
+  background-color: #d1d5db;
+}
+
+.admin-layout.light .ant-switch-checked {
+  background-color: @admin-light-primary-color;
+}
+
+// 头像样式 - 浅色模式
+.admin-layout.light .ant-avatar {
+  background-color: @admin-light-primary-color;
+  color: @admin-light-bg-card;
+}
+
+// 徽章样式 - 浅色模式
+.admin-layout.light .ant-badge-dot {
+  background-color: @admin-light-primary-color;
+  // box-shadow: 0 0 0 2px @admin-light-bg-card;
+}
+
+// 分割线样式 - 浅色模式
+.admin-layout.light .ant-divider {
+  background-color: @admin-light-border;
+}
+
+// 响应式设计 - 浅色模式
+@media (max-width: 768px) {
+  .admin-layout.light .admin-content {
+    padding: 16px;
+  }
+  
+  .admin-layout.light .admin-header {
+    padding: 0 16px;
+  }
+  
+  .admin-layout.light .admin-logo {
+    padding: 0 16px;
+  }
+  
+  .admin-layout.light .admin-card {
+    margin-bottom: 16px;
+  }
+  
+  .admin-layout.light .admin-tab-item {
+    margin-bottom: 12px;
+  }
 }
 
 /* 覆盖 antd 表单样式 */
-.ant-form-item-label > label {
-  color: #e5e7eb !important;
-  font-weight: 500 !important;
+.admin-layout .ant-form-item-label > label {
+  color: @admin-dark-text-secondary;
+  font-weight: 500;
 }
 
-.ant-input,
-.ant-input-number,
-.ant-input-textarea {
-  background: rgba(15, 23, 42, 0.8) !important;
-  border: 1px solid rgba(148, 163, 184, 0.4) !important;
-  border-radius: 8px !important;
-  color: #f9fafb !important;
-  transition: all 0.3s ease !important;
+.admin-layout .ant-input,
+.admin-layout .ant-input-number,
+.admin-layout .ant-input-textarea {
+  background: @admin-dark-bg-input;
+  border: 1px solid @admin-dark-border-input;
+  border-radius: @admin-border-radius-sm;
+  color: @admin-dark-text-primary;
+  transition: @admin-transition;
 }
 
-.ant-input:focus,
-.ant-input-number:focus,
-.ant-input-textarea:focus {
-  border-color: #fbbf24 !important;
-  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2) !important;
+.admin-layout .ant-input:hover,
+.admin-layout .ant-input-number:hover,
+.admin-layout .ant-input-textarea:hover {
+  border-color: @admin-dark-primary-light;
 }
 
-.ant-input::placeholder,
-.ant-input-textarea::placeholder {
-  color: rgba(148, 163, 184, 0.6) !important;
+.admin-layout .ant-input:focus,
+.admin-layout .ant-input-number:focus,
+.admin-layout .ant-input-number-focused,
+.admin-layout .ant-input-textarea:focus {
+  border-color: @admin-dark-primary-color;
+  box-shadow: 0 0 0 2px @admin-dark-shadow-focus;
 }
 
-.ant-btn-primary {
-  background: linear-gradient(135deg, #fbbf24, #fb923c) !important;
-  border: none !important;
-  border-radius: 999px !important;
-  color: #111827 !important;
-  font-weight: 500 !important;
-  padding: 8px 24px !important;
-  transition: all 0.3s ease !important;
+.admin-layout .ant-input::placeholder,
+.admin-layout .ant-input-textarea::placeholder {
+  color: @admin-dark-placeholder;
 }
 
-.ant-btn-primary:hover {
-  opacity: 0.9 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4) !important;
+/* 覆盖 antd InputNumber 样式 */
+.admin-layout .ant-input-number {
+  background: @admin-dark-bg-input;
+  border: 1px solid @admin-dark-border;
+  border-radius: @admin-border-radius-sm;
+  transition: @admin-transition;
 }
 
-.ant-divider {
-  background-color: rgba(148, 163, 184, 0.3) !important;
-  margin: 24px 0 !important;
+.admin-layout .ant-input-number:hover {
+  border-color: @admin-dark-primary-light;
+}
+
+.admin-layout .ant-input-number:focus,
+.admin-layout .ant-input-number-focused {
+  border-color: @admin-dark-primary-color;
+  box-shadow: 0 0 0 2px @admin-dark-shadow-focus;
+}
+
+.admin-layout .ant-input-number-input {
+  background: transparent;
+  border: none;
+  color: @admin-dark-text-primary;
+}
+
+.admin-layout .ant-input-number-input::placeholder {
+  color: @admin-dark-placeholder;
+}
+
+.admin-layout .ant-input-number-handler-wrap {
+  background: @admin-dark-bg-input;
+  border-left: 1px solid @admin-dark-border-input;
+}
+
+.admin-layout .ant-input-number-handler {
+  color: @admin-dark-text-secondary;
+}
+
+.admin-layout .ant-input-number-handler:hover {
+  color: @admin-dark-primary-color;
+}
+
+.admin-layout .ant-btn-primary {
+  background: linear-gradient(135deg, @admin-dark-primary-gradient-start, @admin-dark-primary-gradient-end);
+  border: none;
+  // border-radius: @admin-border-radius-full;
+  color: @admin-dark-bg-primary;
+  font-weight: 500;
+  padding: 12px 24px;
+  height: 40px;
+  transition: @admin-transition;
+}
+
+.admin-layout .ant-btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  // box-shadow: 0 4px 12px @admin-dark-shadow-primary;
+}
+
+.admin-layout .ant-divider {
+  background-color: @admin-dark-border;
+  margin: 24px 0;
 }
 
 /* 覆盖 antd Switch 样式 */
-.ant-switch {
-  background-color: rgba(148, 163, 184, 0.4) !important;
+.admin-layout .ant-switch {
+  background-color: @admin-dark-border-input;
 }
 
-.ant-switch-checked {
-  background-color: #fbbf24 !important;
+.admin-layout .ant-switch-checked {
+  background-color: @admin-dark-primary-color;
 }
 
 /* 覆盖 antd Menu 样式 */
-.ant-menu-dark {
-  background: transparent !important;
+.admin-layout .ant-menu-dark {
+  background: transparent;
+  margin-top: 16px;
+  position: relative;
+  width: 100%;
 }
 
-.ant-menu-dark .ant-menu-item {
-  color: rgba(249, 250, 251, 0.8) !important;
-  margin: 0 8px !important;
-  border-radius: 8px !important;
-  margin-bottom: 4px !important;
-  transition: all 0.3s ease !important;
+.admin-layout .ant-menu-dark .ant-menu-item {
+  color: rgba(249, 250, 251, 0.8);
+  width: calc(100% - 16px);
+  margin: 0 8px;
+  border-radius: @admin-border-radius-sm;
+  margin-bottom: 4px;
+  transition: @admin-transition;
 }
 
-.ant-menu-dark .ant-menu-item:hover {
-  background-color: rgba(251, 191, 36, 0.2) !important;
-  color: #f9fafb !important;
+.admin-layout .ant-menu-dark .ant-menu-item:hover {
+  background-color: @admin-dark-primary-hover;
+  width: calc(100% - 16px);
+  color: @admin-dark-text-primary;
 }
 
-.ant-menu-dark .ant-menu-item-selected {
-  background: linear-gradient(135deg, #fbbf24, #fb923c) !important;
-  color: #111827 !important;
-  font-weight: 500 !important;
+.admin-layout .ant-menu-dark .ant-menu-item-selected {
+  background: linear-gradient(135deg, @admin-dark-primary-gradient-start, @admin-dark-primary-gradient-end);
+  color: @admin-dark-bg-primary;
+  font-weight: 500;
 }
 
 /* 覆盖 antd Avatar 样式 */
-.ant-avatar {
-  background-color: #fbbf24 !important;
-  color: #111827 !important;
-  font-weight: 500 !important;
+.admin-layout .ant-avatar {
+  background-color: @admin-dark-primary-color;
+  color: @admin-dark-bg-primary;
+  font-weight: 500;
 }
 
 /* 覆盖 antd Badge 样式 */
-.ant-badge-dot {
-  background-color: #fbbf24 !important;
-  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.9) !important;
+.admin-layout .ant-badge-dot {
+  background-color: @admin-dark-primary-color;
+  // box-shadow: 0 0 0 2px @admin-dark-bg-sider;
+}
+
+/* 覆盖 antd Table 样式 */
+.admin-layout .ant-table {
+  background: transparent;
+}
+
+.admin-layout .ant-table-container {
+  background: transparent;
+}
+
+.admin-layout .ant-table-thead > tr > th {
+  background: @admin-dark-bg-input;
+  border-bottom: 1px solid @admin-dark-border;
+  color: @admin-dark-text-primary;
+  font-weight: 600;
+}
+
+.admin-layout .ant-table-tbody > tr > td {
+  background: @admin-dark-bg-input;
+  border-bottom: 1px solid @admin-dark-border-light;
+  color: @admin-dark-text-secondary;
+}
+
+.admin-layout .ant-table-tbody > tr:hover > td {
+  background: @admin-dark-table-row-hover;
+}
+
+.admin-layout .ant-table-pagination.ant-pagination {
+  color: @admin-dark-text-primary;
+}
+
+.admin-layout .ant-pagination-item {
+  background: @admin-dark-bg-input;
+  border-color: @admin-dark-border-input;
+  color: @admin-dark-text-secondary;
+}
+
+.admin-layout .ant-pagination-item a {
+  color: @admin-dark-text-secondary;
+}
+
+.admin-layout .ant-pagination-item-active {
+  background: linear-gradient(135deg, @admin-dark-primary-gradient-start, @admin-dark-primary-gradient-end);
+  border-color: transparent;
+}
+
+.admin-layout .ant-pagination-item-active a {
+  color: @admin-dark-bg-primary;
+  font-weight: 500;
+}
+
+.admin-layout .ant-pagination-prev,
+.admin-layout .ant-pagination-next {
+  background: @admin-dark-bg-input;
+  border-color: @admin-dark-border-input;
+  color: @admin-dark-text-secondary;
+}
+
+.admin-layout .ant-pagination-prev:hover,
+.admin-layout .ant-pagination-next:hover,
+.admin-layout .ant-pagination-item:hover {
+  border-color: @admin-dark-primary-color;
+}
+
+.admin-layout .ant-pagination-disabled {
+  background: @admin-dark-disabled-bg;
+  border-color: @admin-dark-disabled-border;
+  color: @admin-dark-disabled-text;
+}
+
+/* 覆盖 antd Modal 样式 */
+.admin-layout .ant-modal-content {
+  background: @admin-dark-bg-sider;
+  border: 1px solid @admin-dark-border;
+  border-radius: @admin-border-radius;
+}
+
+.admin-layout .ant-modal-header {
+  background: transparent;
+  border-bottom: 1px solid @admin-dark-border;
+  padding: 20px 24px;
+}
+
+.admin-layout .ant-modal-title {
+  color: @admin-dark-text-primary;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.admin-layout .ant-modal-body {
+  color: @admin-dark-text-secondary;
+  padding: 24px;
+}
+
+.admin-layout .ant-modal-footer {
+  background: transparent;
+  border-top: 1px solid @admin-dark-border;
+  padding: 16px 24px;
+}
+
+.admin-layout .ant-modal-close-x {
+  color: @admin-dark-text-secondary;
+}
+
+.admin-layout .ant-modal-close-x:hover {
+  color: @admin-dark-text-primary;
+}
+
+/* 覆盖 antd Popconfirm 样式 */
+.admin-layout .ant-popover-inner {
+  background: @admin-dark-bg-sider;
+  border: 1px solid @admin-dark-border;
+  border-radius: @admin-border-radius-sm;
+}
+
+.admin-layout .ant-popover-inner-content {
+  color: @admin-dark-text-secondary;
+}
+
+.admin-layout .ant-popconfirm-title {
+  color: @admin-dark-text-primary;
+  font-weight: 500;
+}
+
+.admin-layout .ant-popconfirm-description {
+  color: @admin-dark-text-tertiary;
+}
+
+.admin-layout .ant-popconfirm-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.admin-layout .ant-btn-primary {
+  box-shadow: none;
+}
+
+.admin-layout .ant-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.admin-layout .ant-btn-default {
+  background: @admin-dark-bg-input;
+  border: 1px solid @admin-dark-border-input;
+  border-radius: @admin-border-radius-sm;
+  color: @admin-dark-text-secondary;
+}
+
+.admin-layout .ant-btn-default:hover {
+  border-color: @admin-dark-primary-color;
+  color: @admin-dark-text-primary;
+}
+
+.admin-layout .ant-btn-dangerous {
+  background: linear-gradient(135deg, @admin-danger-color, @admin-danger-hover);
+  border: none;
+  border-radius: @admin-border-radius-sm;
+  color: @admin-dark-text-primary;
+}
+
+.admin-layout .ant-btn-dangerous:hover {
+  opacity: 0.9;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .admin-content {
+  .admin-layout .admin-content {
     padding: 16px;
   }
   
-  .admin-header {
+  .admin-layout .admin-header {
     padding: 0 16px;
   }
   
-  .admin-logo {
+  .admin-layout .admin-logo {
     padding: 0 16px;
   }
   
-  .admin-card {
-    margin-bottom: 16px !important;
+  .admin-layout .admin-card {
+    margin-bottom: 16px;
   }
   
-  .admin-tab-item {
-    margin-bottom: 12px !important;
+  .admin-layout .admin-tab-item {
+    margin-bottom: 12px;
   }
 }
 
