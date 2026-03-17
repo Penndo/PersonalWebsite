@@ -15,6 +15,7 @@ import {
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { articleApi } from '@/services/api';
 import type { Article } from '@/types';
+import { useSystemTheme } from '@/utils/theme';
 
 const { Title } = Typography;
 
@@ -25,6 +26,7 @@ const ArticlesManage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [form] = Form.useForm();
+  const themeMode = useSystemTheme();
 
   useEffect(() => {
     fetchArticles();
@@ -188,6 +190,7 @@ const ArticlesManage: React.FC = () => {
         }}
         confirmLoading={saving}
         width={700}
+        wrapClassName={`admin-layout ${themeMode}`}
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
           <Form.Item

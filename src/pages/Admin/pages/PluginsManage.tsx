@@ -15,6 +15,7 @@ import {
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { pluginApi } from '@/services/api';
 import type { Plugin } from '@/types';
+import { useSystemTheme } from '@/utils/theme';
 
 const { Title } = Typography;
 
@@ -25,6 +26,7 @@ const PluginsManage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState<Plugin | null>(null);
   const [form] = Form.useForm();
+  const themeMode = useSystemTheme();
 
   useEffect(() => {
     fetchPlugins();
@@ -194,6 +196,7 @@ const PluginsManage: React.FC = () => {
         }}
         confirmLoading={saving}
         width={700}
+        wrapClassName={`admin-layout ${themeMode}`}
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
           <Form.Item

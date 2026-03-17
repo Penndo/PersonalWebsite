@@ -15,6 +15,7 @@ import {
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { projectApi } from '@/services/api';
 import type { Project } from '@/types';
+import { useSystemTheme } from '@/utils/theme';
 
 const { Title } = Typography;
 
@@ -25,6 +26,7 @@ const ProjectsManage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [form] = Form.useForm();
+  const themeMode = useSystemTheme();
 
   useEffect(() => {
     fetchProjects();
@@ -188,6 +190,7 @@ const ProjectsManage: React.FC = () => {
         }}
         confirmLoading={saving}
         width={700}
+        wrapClassName={`admin-layout ${themeMode}`}
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
           <Form.Item
