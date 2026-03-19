@@ -2,45 +2,95 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header, TabNav, Card } from '@/components';
-import { mockProjects, mockArticles, mockPlugins } from '@/services/mock';
-import { tabsApi } from '@/services/api';
+import { tabsApi, projectApi, articleApi, pluginApi } from '@/services/api';
 import type { TabType, Project, Article, Plugin } from '@/types';
 import './Products.less';
-
-const getInitialTab = (hash: string): TabType => {
-  const tabMap: Record<string, TabType> = {
-    '#works': 'works',
-    '#articles': 'articles',
-    '#plugins': 'plugins',
-  };
-  return tabMap[hash] || 'works';
-};
 
 const Products: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const activeTab = getInitialTab(location.hash);
-  const [projects] = useState<Project[]>(mockProjects);
-  const [articles] = useState<Article[]>(mockArticles);
-  const [plugins] = useState<Plugin[]>(mockPlugins);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [plugins, setPlugins] = useState<Plugin[]>([]);
   const [loading, setLoading] = useState(false);
-  const [tabs, setTabs] = useState([
-    { key: 'works' as const, label: '作品' },
-    { key: 'articles' as const, label: '文章' },
-    { key: 'plugins' as const, label: '插件' },
+  const [tabs, setTabs] = useState<Array<{ key: TabType; label: string }>>([
+    { key: 'works', label: '作品' },
+    { key: 'articles', label: '文章' },
+    { key: 'plugins', label: '插件' },
   ]);
 
   useEffect(() => {
     tabsApi.getTabs()
       .then((res) => {
         if (res.data && res.data.length > 0) {
-          setTabs(res.data);
+          setTabs(
+            res.data
+              .filter((t) => t.enabled)
+              .slice()
+              .sort((a, b) => a.order - b.order)
+              .map((t) => ({ key: t.key, label: t.label })),
+          );
         }
       })
       .catch((err) => {
         console.error('Failed to fetch tabs', err);
       });
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchLists = async () => {
+      try {
+        const [projectsRes, articlesRes, pluginsRes] = await Promise.all([
+          projectApi.getProjects(),
+          articleApi.getArticles(),
+          pluginApi.getPlugins(),
+        ]);
+
+        if (cancelled) return;
+
+        setProjects(
+          (projectsRes.data || []).map((p) => ({
+            ...p,
+            id: String(p.id),
+            description: p.description || p.summary,
+            cover: p.cover || p.coverUrl,
+          })),
+        );
+        setArticles(
+          (articlesRes.data || []).map((a) => ({
+            ...a,
+            id: String(a.id),
+            description: a.description || a.summary,
+            cover: a.cover || a.coverUrl,
+            date: a.date || (a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : undefined),
+          })),
+        );
+        setPlugins(
+          (pluginsRes.data || []).map((p) => ({
+            ...p,
+            id: String(p.id),
+            description: p.description || p.summary,
+            cover: p.cover || p.coverUrl,
+            link: p.link || p.downloadUrl || p.repositoryUrl,
+          })),
+        );
+      } catch (err) {
+        console.error('Failed to fetch lists', err);
+      }
+    };
+
+    fetchLists();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const hashKey = location.hash.startsWith('#') ? location.hash.slice(1) : '';
+  const defaultTab = tabs[0]?.key || 'works';
+  const activeTab = tabs.some((t) => t.key === hashKey) ? hashKey : defaultTab;
 
   const handleTabChange = (tab: TabType) => {
     if (tab === activeTab) return;
@@ -138,7 +188,11 @@ const Products: React.FC = () => {
       );
     }
 
-    return null;
+    return (
+      <div style={{ padding: 48, textAlign: 'center', opacity: 0.8 }}>
+        暂无内容
+      </div>
+    );
   };
 
   return (

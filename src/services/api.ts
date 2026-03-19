@@ -73,13 +73,6 @@ export const pluginApi = {
 export const getArticleDetail = async (
   id: string,
 ): Promise<ArticleDetail> => {
-  if (import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL) {
-    const article = mockArticleDetail[id];
-    if (!article) {
-      throw new Error('Article not found');
-    }
-    return article;
-  }
   try {
     const response = await articleApi.getArticleById(id);
     // 转换后端数据为前端需要的格式
@@ -112,13 +105,6 @@ export const getArticleDetail = async (
 };
 
 export const getPluginDetail = async (id: string): Promise<PluginDetail> => {
-  if (import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL) {
-    const plugin = mockPluginDetail[id];
-    if (!plugin) {
-      throw new Error('Plugin not found');
-    }
-    return plugin;
-  }
   try {
     const response = await pluginApi.getPluginById(id);
     // 转换后端数据为前端需要的格式
@@ -153,13 +139,6 @@ export const getPluginDetail = async (id: string): Promise<PluginDetail> => {
 export const getProjectDetail = async (
   id: string,
 ): Promise<ProjectDetail> => {
-  if (import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL) {
-    const project = mockProjectDetail[id];
-    if (!project) {
-      throw new Error('Project not found');
-    }
-    return project;
-  }
   try {
     const response = await projectApi.getProjectById(id);
     // 转换后端数据为前端需要的格式

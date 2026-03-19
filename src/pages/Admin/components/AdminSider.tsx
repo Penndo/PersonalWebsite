@@ -47,9 +47,19 @@ const AdminSider: React.FC<AdminSiderProps> = ({ collapsed }) => {
   const location = useLocation();
 
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed} className="admin-sider">
-      <div className="admin-logo">
-        <span className="admin-logo-text">{collapsed ? '管理' : '后台管理'}</span>
+    <Sider trigger={null} collapsible collapsed={collapsed} theme="dark">
+      <div
+        style={{
+          height: 64,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '0 24px',
+        }}
+      >
+        <span style={{ color: 'rgba(255, 255, 255, 0.88)', fontSize: 18, fontWeight: 600 }}>
+          {collapsed ? '管理' : '后台管理'}
+        </span>
       </div>
       <Menu
         theme="dark"

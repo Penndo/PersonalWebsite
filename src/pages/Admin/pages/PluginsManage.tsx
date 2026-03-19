@@ -4,7 +4,6 @@ import {
   Form,
   Input,
   Button,
-  Typography,
   Spin,
   message,
   Table,
@@ -12,12 +11,9 @@ import {
   Popconfirm,
   Modal,
 } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { pluginApi } from '@/services/api';
 import type { Plugin } from '@/types';
-import { useSystemTheme } from '@/utils/theme';
-
-const { Title } = Typography;
 
 const PluginsManage: React.FC = () => {
   const [plugins, setPlugins] = useState<Plugin[]>([]);
@@ -26,7 +22,6 @@ const PluginsManage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState<Plugin | null>(null);
   const [form] = Form.useForm();
-  const themeMode = useSystemTheme();
 
   useEffect(() => {
     fetchPlugins();
@@ -158,7 +153,7 @@ const PluginsManage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
+      <div style={{ padding: 48, textAlign: 'center' }}>
         <Spin size="large" tip="加载中..." />
       </div>
     );
@@ -166,13 +161,10 @@ const PluginsManage: React.FC = () => {
 
   return (
     <>
-      <Title level={4} className="admin-page-title">插件管理</Title>
-
       <Card
-        className="admin-card"
-        variant="borderless"
+        title="插件管理"
         extra={
-          <Button type="primary" onClick={() => openModal()}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
             新增插件
           </Button>
         }
@@ -196,7 +188,6 @@ const PluginsManage: React.FC = () => {
         }}
         confirmLoading={saving}
         width={700}
-        wrapClassName={`admin-layout ${themeMode}`}
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
           <Form.Item

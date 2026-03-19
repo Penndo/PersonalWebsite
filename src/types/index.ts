@@ -108,4 +108,4 @@ export interface PluginDetail {
   };
 }
 
-export type TabType = 'works' | 'articles' | 'plugins';
+export type TabType = string;

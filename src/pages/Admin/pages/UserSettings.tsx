@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Card, Form, Input, InputNumber, Button, Typography, Spin, message } from 'antd';
+import { Card, Form, Input, InputNumber, Button, Spin, message } from 'antd';
 import { userApi } from '@/services/api';
 import type { UserInfo } from '@/types';
-
-const { Title } = Typography;
 
 const UserSettings: React.FC = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -57,7 +55,7 @@ const UserSettings: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
+      <div style={{ padding: 48, textAlign: 'center' }}>
         <Spin size="large" tip="加载中..." />
       </div>
     );
@@ -65,9 +63,7 @@ const UserSettings: React.FC = () => {
 
   return (
     <>
-      <Title level={4} className="admin-page-title">用户设置</Title>
-
-      <Card title="用户信息" className="admin-card" variant="borderless">
+      <Card title="用户信息">
         {userInfo && (
           <Form layout="vertical">
             <Form.Item label="姓名">

@@ -4,7 +4,6 @@ import {
   Form,
   Input,
   Button,
-  Typography,
   Spin,
   message,
   Table,
@@ -15,9 +14,6 @@ import {
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { projectApi } from '@/services/api';
 import type { Project } from '@/types';
-import { useSystemTheme } from '@/utils/theme';
-
-const { Title } = Typography;
 
 const ProjectsManage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -26,7 +22,6 @@ const ProjectsManage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [form] = Form.useForm();
-  const themeMode = useSystemTheme();
 
   useEffect(() => {
     fetchProjects();
@@ -152,7 +147,7 @@ const ProjectsManage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
+      <div style={{ padding: 48, textAlign: 'center' }}>
         <Spin size="large" tip="加载中..." />
       </div>
     );
@@ -160,11 +155,8 @@ const ProjectsManage: React.FC = () => {
 
   return (
     <>
-      <Title level={4} className="admin-page-title">项目管理</Title>
-
       <Card
-        className="admin-card"
-        variant="borderless"
+        title="项目管理"
         extra={
           <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
             新增项目
@@ -190,7 +182,6 @@ const ProjectsManage: React.FC = () => {
         }}
         confirmLoading={saving}
         width={700}
-        wrapClassName={`admin-layout ${themeMode}`}
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
           <Form.Item
