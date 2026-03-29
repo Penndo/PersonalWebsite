@@ -161,7 +161,7 @@ export const getProjectDetail = async (
       summary: projectData.summary,
       background: projectData.content || '',
       designThinking: '',
-      images: [],
+      images: projectData.coverUrl ? [projectData.coverUrl] : [],
       tags: projectData.tags || [],
       achievements: [],
       client: '',
