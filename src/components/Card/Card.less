@@ -1,5 +1,10 @@
 @import '@/styles/variables.less';
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .card {
   background: @bg-card;
   backdrop-filter: blur(4px);
@@ -22,14 +27,55 @@
   
   .card-cover {
     width: 100%;
-    // height: 250px;
+    height: 250px;
     border-radius: @border-radius-sm;
     overflow: hidden;
+    position: relative;
     
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+    
+    .card-cover-placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.1);
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: @primary-color;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+  
+  .card-cover-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255, 183, 48, 0.1), rgba(255, 183, 48, 0.05));
+    
+    .error-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      
+      span {
+        font-size: 14px;
+      }
     }
   }
 }

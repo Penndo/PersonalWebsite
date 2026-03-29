@@ -70,6 +70,18 @@ export const pluginApi = {
   deletePlugin: (id: string) => api.delete(`/plugins/${id}`),
 };
 
+export const uploadApi = {
+  uploadImage: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post<{ url: string }>('/upload/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+};
+
 export const getArticleDetail = async (
   id: string,
 ): Promise<ArticleDetail> => {

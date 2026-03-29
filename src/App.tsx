@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Homepage, Products } from '@/pages';
 import { GradientBackground, DynamicParticles } from '@/components';
 import { userApi } from '@/services/api';
@@ -9,9 +8,14 @@ import './styles/global.less';
 
 function App() {
   const productsRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
   const [isScrolling, setIsScrolling] = useState(false);
-  const [currentSection, setCurrentSection] = useState<'home' | 'products'>('home');
+  // 组件挂载时，检查是否有从详情页返回的记录，作为初始状态
+  const [currentSection, setCurrentSection] = useState<'home' | 'products'>(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('scrollPosition')) {
+      return 'products';
+    }
+    return 'home';
+  });
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   const scrollToSection = (element: HTMLElement | null, section: 'home' | 'products') => {
@@ -22,19 +26,7 @@ function App() {
     setTimeout(() => setIsScrolling(false), 800);
   };
 
-  useEffect(() => {
-    if (location.hash && productsRef.current) {
-      const element = productsRef.current;
-      const timer = setTimeout(() => {
-        if (isScrolling) return;
-        setIsScrolling(true);
-        setCurrentSection('products');
-        element.scrollIntoView({ behavior: 'smooth' });
-        setTimeout(() => setIsScrolling(false), 800);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [location.hash, isScrolling]);
+
 
   useEffect(() => {
     userApi
@@ -60,6 +52,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    
     let scrollTimeout: NodeJS.Timeout;
 
     const scrollToProducts = () => {
@@ -131,7 +124,7 @@ function App() {
         onScrollDown={() => scrollToSection(productsRef.current, 'products')}
       />
       <div ref={productsRef}>
-        <Products />
+        <Products currentSection={currentSection} />
       </div>
     </div>
   );

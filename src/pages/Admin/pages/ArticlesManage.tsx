@@ -10,9 +10,11 @@ import {
   Space,
   Popconfirm,
   Modal,
+  Upload,
+  Image,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { articleApi } from '@/services/api';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+import { articleApi, uploadApi } from '@/services/api';
 import type { Article } from '@/types';
 
 const ArticlesManage: React.FC = () => {
@@ -208,8 +210,52 @@ const ArticlesManage: React.FC = () => {
           <Form.Item name="content" label="内容">
             <Input.TextArea placeholder="请输入文章详细内容" rows={4} />
           </Form.Item>
-          <Form.Item name="coverUrl" label="封面图片 URL">
-            <Input placeholder="请输入封面图片 URL" />
+          <Form.Item name="coverUrl" label="封面图片">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <Form.Item
+                noStyle
+                shouldUpdate={(prevValues, currentValues) => prevValues.coverUrl !== currentValues.coverUrl}
+              >
+                {({ getFieldValue }) => {
+                  const coverUrl = getFieldValue('coverUrl');
+                  return coverUrl ? (
+                    <Image
+                      src={coverUrl}
+                      alt="封面预览"
+                      style={{ width: 120, height: 80, objectFit: 'cover', marginBottom: '8px' }}
+                    />
+                  ) : null;
+                }}
+              </Form.Item>
+              <Upload.Dragger
+                name="file"
+                multiple={false}
+                beforeUpload={async (file) => {
+                  try {
+                    const response = await uploadApi.uploadImage(file);
+                    form.setFieldsValue({ coverUrl: response.data.url });
+                    message.success('图片上传成功');
+                  } catch (error) {
+                    message.error('图片上传失败，请重试');
+                  }
+                  return false; // 阻止自动上传
+                }}
+                showUploadList={false}
+              >
+                <p className="ant-upload-drag-icon">
+                  <UploadOutlined />
+                </p>
+                <p className="ant-upload-text">点击或拖拽文件到此处上传</p>
+                <p className="ant-upload-hint">
+                  支持 JPG、PNG 等格式，文件大小不超过 2MB
+                </p>
+              </Upload.Dragger>
+              <Input
+                placeholder="或直接输入图片 URL"
+                value={form.getFieldValue('coverUrl')}
+                onChange={(e) => form.setFieldsValue({ coverUrl: e.target.value })}
+              />
+            </div>
           </Form.Item>
           <Form.Item name="tags" label="标签">
             <Input placeholder="请输入标签，用逗号分隔" />
