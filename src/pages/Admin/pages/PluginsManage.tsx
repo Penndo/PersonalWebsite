@@ -1,29 +1,23 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
-  Form,
-  Input,
   Button,
   Spin,
   message,
   Table,
   Space,
   Popconfirm,
-  Modal,
-  Upload,
-  Image,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
-import { pluginApi, uploadApi } from '@/services/api';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { pluginApi } from '@/services/api';
 import type { Plugin } from '@/types';
 
 const PluginsManage: React.FC = () => {
+  const navigate = useNavigate();
   const [plugins, setPlugins] = useState<Plugin[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPlugin, setEditingPlugin] = useState<Plugin | null>(null);
-  const [form] = Form.useForm();
 
   useEffect(() => {
     fetchPlugins();
@@ -42,36 +36,6 @@ const PluginsManage: React.FC = () => {
     }
   };
 
-  const handleSave = async (values: Record<string, string | undefined>) => {
-    setSaving(true);
-    try {
-      const pluginData = {
-        ...values,
-        tags: values.tags?.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0) || [],
-      };
-
-      if (editingPlugin?.id) {
-        const res = await pluginApi.updatePlugin(editingPlugin.id, pluginData);
-        setPlugins((prev) =>
-          prev.map((p) => (p.id === editingPlugin.id ? res.data : p))
-        );
-        message.success('插件更新成功');
-      } else {
-        const res = await pluginApi.createPlugin(pluginData);
-        setPlugins((prev) => [...prev, res.data]);
-        message.success('插件创建成功');
-      }
-      setIsModalOpen(false);
-      setEditingPlugin(null);
-      form.resetFields();
-    } catch (err) {
-      console.error(err);
-      message.error('保存失败，请重试');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleDelete = async (id: string) => {
     setSaving(true);
     try {
@@ -86,18 +50,12 @@ const PluginsManage: React.FC = () => {
     }
   };
 
-  const openModal = (plugin?: Plugin) => {
+  const openEditor = (plugin?: Plugin) => {
     if (plugin) {
-      setEditingPlugin(plugin);
-      form.setFieldsValue({
-        ...plugin,
-        tags: Array.isArray(plugin.tags) ? plugin.tags.join(', ') : plugin.tags,
-      });
+      navigate(`/admin/editor/plugin/${plugin.id}`);
     } else {
-      setEditingPlugin(null);
-      form.resetFields();
+      navigate(`/admin/editor/plugin`);
     }
-    setIsModalOpen(true);
   };
 
   const columns = [
@@ -137,7 +95,7 @@ const PluginsManage: React.FC = () => {
           <Button
             type="text"
             icon={<EditOutlined />}
-            onClick={() => openModal(record)}
+            onClick={() => openEditor(record)}
           />
           <Popconfirm
             title="确认删除"
@@ -162,122 +120,21 @@ const PluginsManage: React.FC = () => {
   }
 
   return (
-    <>
-      <Card
-        title="插件管理"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
-            新增插件
-          </Button>
-        }
-      >
-        <Table
-          dataSource={plugins}
-          columns={columns}
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
-        />
-      </Card>
-
-      <Modal
-        title={editingPlugin ? '编辑插件' : '新增插件'}
-        open={isModalOpen}
-        onOk={() => form.submit()}
-        onCancel={() => {
-          setIsModalOpen(false);
-          setEditingPlugin(null);
-          form.resetFields();
-        }}
-        confirmLoading={saving}
-        width={700}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSave}>
-          <Form.Item
-            name="title"
-            label="标题"
-            rules={[{ required: true, message: '请输入标题' }]}
-          >
-            <Input placeholder="请输入插件标题" />
-          </Form.Item>
-          <Form.Item
-            name="routeId"
-            label="路由ID"
-            rules={[{ required: true, message: '请输入路由ID' }]}
-          >
-            <Input placeholder="请输入路由ID（唯一标识）" />
-          </Form.Item>
-          <Form.Item name="version" label="版本">
-            <Input placeholder="请输入版本号，如 v1.0.0" />
-          </Form.Item>
-          <Form.Item
-            name="summary"
-            label="摘要"
-            rules={[{ required: true, message: '请输入摘要' }]}
-          >
-            <Input.TextArea placeholder="请输入插件摘要" rows={2} />
-          </Form.Item>
-          <Form.Item name="content" label="内容">
-            <Input.TextArea placeholder="请输入插件详细内容" rows={4} />
-          </Form.Item>
-          <Form.Item name="coverUrl" label="封面图片">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <Form.Item
-                noStyle
-                shouldUpdate={(prevValues, currentValues) => prevValues.coverUrl !== currentValues.coverUrl}
-              >
-                {({ getFieldValue }) => {
-                  const coverUrl = getFieldValue('coverUrl');
-                  return coverUrl ? (
-                    <Image
-                      src={coverUrl}
-                      alt="封面预览"
-                      style={{ width: 120, height: 80, objectFit: 'cover', marginBottom: '8px' }}
-                    />
-                  ) : null;
-                }}
-              </Form.Item>
-              <Upload.Dragger
-                name="file"
-                multiple={false}
-                beforeUpload={async (file) => {
-                  try {
-                    const response = await uploadApi.uploadImage(file);
-                    form.setFieldsValue({ coverUrl: response.data.url });
-                    message.success('图片上传成功');
-                  } catch (error) {
-                    message.error('图片上传失败，请重试');
-                  }
-                  return false; // 阻止自动上传
-                }}
-                showUploadList={false}
-              >
-                <p className="ant-upload-drag-icon">
-                  <UploadOutlined />
-                </p>
-                <p className="ant-upload-text">点击或拖拽文件到此处上传</p>
-                <p className="ant-upload-hint">
-                  支持 JPG、PNG 等格式，文件大小不超过 2MB
-                </p>
-              </Upload.Dragger>
-              <Input
-                placeholder="或直接输入图片 URL"
-                value={form.getFieldValue('coverUrl')}
-                onChange={(e) => form.setFieldsValue({ coverUrl: e.target.value })}
-              />
-            </div>
-          </Form.Item>
-          <Form.Item name="repositoryUrl" label="仓库地址">
-            <Input placeholder="请输入代码仓库地址" />
-          </Form.Item>
-          <Form.Item name="downloadUrl" label="下载地址">
-            <Input placeholder="请输入下载地址" />
-          </Form.Item>
-          <Form.Item name="tags" label="标签">
-            <Input placeholder="请输入标签，用逗号分隔" />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
+    <Card
+      title="插件管理"
+      extra={
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => openEditor()}>
+          新增插件
+        </Button>
+      }
+    >
+      <Table
+        dataSource={plugins}
+        columns={columns}
+        rowKey="id"
+        pagination={{ pageSize: 10 }}
+      />
+    </Card>
   );
 };
 

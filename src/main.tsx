@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App.tsx';
 import { ProjectDetail, ArticleDetail, PluginDetail, Admin } from '@/pages';
+import Editor from '@/pages/Editor/Editor';
 import UserSettings from '@/pages/Admin/pages/UserSettings';
 import TabsSettings from '@/pages/Admin/pages/TabsSettings';
 import ProjectsManage from '@/pages/Admin/pages/ProjectsManage';
@@ -24,6 +25,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="projects" element={<ProjectsManage />} />
           <Route path="articles" element={<ArticlesManage />} />
           <Route path="plugins" element={<PluginsManage />} />
+          <Route path="editor/:type" element={<Editor type="project" />} />
+          <Route path="editor/:type/:id" element={<Editor type="project" />} />
         </Route>
       </Routes>
     </BrowserRouter>

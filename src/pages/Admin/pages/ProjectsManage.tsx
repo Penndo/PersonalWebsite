@@ -1,29 +1,23 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
-  Form,
-  Input,
   Button,
   Spin,
   message,
   Table,
   Space,
   Popconfirm,
-  Modal,
-  Upload,
-  Image,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
-import { projectApi, uploadApi } from '@/services/api';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { projectApi } from '@/services/api';
 import type { Project } from '@/types';
 
 const ProjectsManage: React.FC = () => {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [form] = Form.useForm();
 
   useEffect(() => {
     fetchProjects();
@@ -42,36 +36,6 @@ const ProjectsManage: React.FC = () => {
     }
   };
 
-  const handleSave = async (values: Record<string, string | undefined>) => {
-    setSaving(true);
-    try {
-      const projectData = {
-        ...values,
-        tags: values.tags?.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0) || [],
-      };
-
-      if (editingProject?.id) {
-        const res = await projectApi.updateProject(editingProject.id, projectData);
-        setProjects((prev) =>
-          prev.map((p) => (p.id === editingProject.id ? res.data : p))
-        );
-        message.success('项目更新成功');
-      } else {
-        const res = await projectApi.createProject(projectData);
-        setProjects((prev) => [...prev, res.data]);
-        message.success('项目创建成功');
-      }
-      setIsModalOpen(false);
-      setEditingProject(null);
-      form.resetFields();
-    } catch (err) {
-      console.error(err);
-      message.error('保存失败，请重试');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleDelete = async (id: string) => {
     setSaving(true);
     try {
@@ -86,18 +50,12 @@ const ProjectsManage: React.FC = () => {
     }
   };
 
-  const openModal = (project?: Project) => {
+  const openEditor = (project?: Project) => {
     if (project) {
-      setEditingProject(project);
-      form.setFieldsValue({
-        ...project,
-        tags: Array.isArray(project.tags) ? project.tags.join(', ') : project.tags,
-      });
+      navigate(`/admin/editor/project/${project.id}`);
     } else {
-      setEditingProject(null);
-      form.resetFields();
+      navigate(`/admin/editor/project`);
     }
-    setIsModalOpen(true);
   };
 
   const columns = [
@@ -131,7 +89,7 @@ const ProjectsManage: React.FC = () => {
           <Button
             type="text"
             icon={<EditOutlined />}
-            onClick={() => openModal(record)}
+            onClick={() => openEditor(record)}
           />
           <Popconfirm
             title="确认删除"
@@ -156,113 +114,21 @@ const ProjectsManage: React.FC = () => {
   }
 
   return (
-    <>
-      <Card
-        title="项目管理"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
-            新增项目
-          </Button>
-        }
-      >
-        <Table
-          dataSource={projects}
-          columns={columns}
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
-        />
-      </Card>
-
-      <Modal
-        title={editingProject ? '编辑项目' : '新增项目'}
-        open={isModalOpen}
-        onOk={() => form.submit()}
-        onCancel={() => {
-          setIsModalOpen(false);
-          setEditingProject(null);
-          form.resetFields();
-        }}
-        confirmLoading={saving}
-        width={700}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSave}>
-          <Form.Item
-            name="title"
-            label="标题"
-            rules={[{ required: true, message: '请输入标题' }]}
-          >
-            <Input placeholder="请输入项目标题" />
-          </Form.Item>
-          <Form.Item
-            name="routeId"
-            label="路由ID"
-            rules={[{ required: true, message: '请输入路由ID' }]}
-          >
-            <Input placeholder="请输入路由ID（唯一标识）" />
-          </Form.Item>
-          <Form.Item
-            name="summary"
-            label="摘要"
-            rules={[{ required: true, message: '请输入摘要' }]}
-          >
-            <Input.TextArea placeholder="请输入项目摘要" rows={2} />
-          </Form.Item>
-          <Form.Item name="content" label="内容">
-            <Input.TextArea placeholder="请输入项目详细内容" rows={4} />
-          </Form.Item>
-          <Form.Item name="coverUrl" label="封面图片">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <Form.Item
-                noStyle
-                shouldUpdate={(prevValues, currentValues) => prevValues.coverUrl !== currentValues.coverUrl}
-              >
-                {({ getFieldValue }) => {
-                  const coverUrl = getFieldValue('coverUrl');
-                  return coverUrl ? (
-                    <Image
-                      src={coverUrl}
-                      alt="封面预览"
-                      style={{ width: 120, height: 80, objectFit: 'cover', marginBottom: '8px' }}
-                    />
-                  ) : null;
-                }}
-              </Form.Item>
-              <Upload.Dragger
-                name="file"
-                multiple={false}
-                beforeUpload={async (file) => {
-                  try {
-                    const response = await uploadApi.uploadImage(file);
-                    form.setFieldsValue({ coverUrl: response.data.url });
-                    message.success('图片上传成功');
-                  } catch (error) {
-                    message.error('图片上传失败，请重试');
-                  }
-                  return false; // 阻止自动上传
-                }}
-                showUploadList={false}
-              >
-                <p className="ant-upload-drag-icon">
-                  <UploadOutlined />
-                </p>
-                <p className="ant-upload-text">点击或拖拽文件到此处上传</p>
-                <p className="ant-upload-hint">
-                  支持 JPG、PNG 等格式，文件大小不超过 2MB
-                </p>
-              </Upload.Dragger>
-              <Input
-                placeholder="或直接输入图片 URL"
-                value={form.getFieldValue('coverUrl')}
-                onChange={(e) => form.setFieldsValue({ coverUrl: e.target.value })}
-              />
-            </div>
-          </Form.Item>
-          <Form.Item name="tags" label="标签">
-            <Input placeholder="请输入标签，用逗号分隔" />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
+    <Card
+      title="项目管理"
+      extra={
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => openEditor()}>
+          新增项目
+        </Button>
+      }
+    >
+      <Table
+        dataSource={projects}
+        columns={columns}
+        rowKey="id"
+        pagination={{ pageSize: 10 }}
+      />
+    </Card>
   );
 };
 

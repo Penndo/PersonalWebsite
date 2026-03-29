@@ -36,6 +36,7 @@ export interface ProjectDetail {
   role: string;
   tools: string[];
   link?: string;
+  content?: string;
 }
 
 export interface Article {

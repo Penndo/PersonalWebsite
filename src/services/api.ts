@@ -168,6 +168,7 @@ export const getProjectDetail = async (
       year: '',
       role: '',
       tools: [],
+      content: projectData.content || '',
     };
   } catch (error) {
     console.error('Failed to fetch project detail:', error);

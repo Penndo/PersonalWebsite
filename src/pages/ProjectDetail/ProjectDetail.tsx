@@ -2,6 +2,10 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
 import { getProjectDetail } from '@/services/api';
 import type { ProjectDetail as ProjectDetailType } from '@/types';
 import './ProjectDetail.less';
@@ -202,68 +206,36 @@ const ProjectDetail: React.FC = () => {
           </div>
         </div>
 
-        <div className="project-info">
-          <motion.section 
-            className="info-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+        <motion.div 
+          className="project-info"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              code({ node, className, children, ...props }: any) {
+                const match = /language-(\w+)/.exec(className || '');
+                return match ? (
+                  <SyntaxHighlighter
+                    {...props}
+                    children={String(children).replace(/\n$/, '')}
+                    style={vscDarkPlus}
+                    language={match[1]}
+                    PreTag="div"
+                  />
+                ) : (
+                  <code {...props} className={className}>
+                    {children}
+                  </code>
+                );
+              },
+            }}
           >
-            <h2>项目背景</h2>
-            <p>{project.background}</p>
-          </motion.section>
-
-          <motion.section 
-            className="info-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            <h2>设计思路</h2>
-            <p>{project.designThinking}</p>
-          </motion.section>
-
-          <motion.section 
-            className="info-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
-            <h2>项目成果</h2>
-            <ul className="achievements-list">
-              {project.achievements.map((achievement, index) => (
-                <li key={index}>{achievement}</li>
-              ))}
-            </ul>
-          </motion.section>
-
-          <motion.section 
-            className="info-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-          >
-            <h2>项目信息</h2>
-            <div className="meta-grid">
-              <div className="meta-item">
-                <span className="meta-label">客户</span>
-                <span className="meta-value">{project.client}</span>
-              </div>
-              <div className="meta-item">
-                <span className="meta-label">年份</span>
-                <span className="meta-value">{project.year}</span>
-              </div>
-              <div className="meta-item">
-                <span className="meta-label">角色</span>
-                <span className="meta-value">{project.role}</span>
-              </div>
-              <div className="meta-item">
-                <span className="meta-label">工具</span>
-                <span className="meta-value">{project.tools.join(' / ')}</span>
-              </div>
-            </div>
-          </motion.section>
-        </div>
+            {project.content || project.background || ''}
+          </ReactMarkdown>
+        </motion.div>
       </motion.div>
     </div>
   );
