@@ -5,6 +5,9 @@ export interface UserInfo {
   hobbies: string[];
   avatar: string;
   introduction: string;
+  phone: string;
+  portfolio?: string;
+  wechatQRCode?: string;
 }
 
 export interface Project {
@@ -110,3 +113,19 @@ export interface PluginDetail {
 }
 
 export type TabType = string;
+
+export interface RecommendedItem {
+  id: string;
+  type: 'project' | 'article' | 'plugin';
+  title: string;
+  defaultImage: string;
+  hoverImage: string;
+  enabled: boolean;
+  order: number;
+}
+
+export interface HomepageConfig {
+  logo?: string;
+  recommendedItems: RecommendedItem[];
+  userInfo: UserInfo;
+}

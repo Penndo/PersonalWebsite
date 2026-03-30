@@ -1,17 +1,25 @@
 import { motion } from 'framer-motion';
 import { Header, DownloadButton } from '@/components';
-import type { UserInfo } from '@/types';
+import type { UserInfo, RecommendedItem } from '@/types';
 import './Homepage.less';
 
 interface HomepageProps {
   userInfo: UserInfo;
+  recommendedItems?: RecommendedItem[];
   onScrollDown: () => void;
 }
 
-const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
+const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], onScrollDown }) => {
+  // 按顺序排序推荐项目
+  const sortedItems = [...recommendedItems].sort((a, b) => a.order - b.order);
+  
+  // 分为左右两列
+  const leftItems = sortedItems.filter((_, index) => index % 2 === 0);
+  const rightItems = sortedItems.filter((_, index) => index % 2 === 1);
+
   return (
     <section className="homepage">
-      <Header />
+      <Header userInfo={userInfo} />
       
       <div className="homepage-content">
         <motion.div 
@@ -22,7 +30,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
         >
           <div className="avatar-wrapper">
             <img 
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Yeatfish" 
+              src={userInfo.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Yeatfish"} 
               alt={userInfo.name}
             />
           </div>
@@ -54,58 +62,44 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          {/* <div className="intro-wrapper"> */}
-            <div className="floating-icons-left">
+          <div className="floating-icons-left">
+            {leftItems.map((item, index) => (
               <motion.div 
-                className="floating-icon icon-hooinn"
+                key={item.id}
+                className={`floating-icon icon-${item.title.toLowerCase()}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
+                transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
               >
-                <img src="/icons/HooInn-Default.png" alt="HooInn" className="icon-default" />
-                <img src="/icons/HooInn-hover.png" alt="HooInn Hover" className="icon-hover" />
+                <img src={item.defaultImage} alt={item.title} className="icon-default" />
+                <img src={item.hoverImage} alt={`${item.title} Hover`} className="icon-hover" />
               </motion.div>
-              <motion.div 
-                className="floating-icon icon-kaiyun"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-              >
-                <img src="/icons/开运-Default.png" alt="开运" className="icon-default" />
-                <img src="/icons/开运-hover.png" alt="开运 Hover" className="icon-hover" />
-              </motion.div>
-            </div>
+            ))}
+          </div>
 
-            <div className="intro-card">
-              <div className="intro-layer intro-layer-1"></div>
-              <div className="intro-layer intro-layer-2"></div>
-              <div className="intro-content">
-                <h2 className="intro-title">👋 欢迎光临！</h2>
-                <p className="intro-text">{userInfo.introduction}</p>
-              </div>
+          <div className="intro-card">
+            <div className="intro-layer intro-layer-1"></div>
+            <div className="intro-layer intro-layer-2"></div>
+            <div className="intro-content">
+              <h2 className="intro-title">👋 欢迎光临！</h2>
+              <p className="intro-text">{userInfo.introduction}</p>
             </div>
+          </div>
 
-            <div className="floating-icons-right">
+          <div className="floating-icons-right">
+            {rightItems.map((item, index) => (
               <motion.div 
-                className="floating-icon icon-pub"
+                key={item.id}
+                className={`floating-icon icon-${item.title.toLowerCase()}`}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.7 }}
+                transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
               >
-                <img src="/icons/PUB-Default.png" alt="PUB" className="icon-default" />
-                <img src="/icons/PUB-Hover.png" alt="PUB Hover" className="icon-hover" />
+                <img src={item.defaultImage} alt={item.title} className="icon-default" />
+                <img src={item.hoverImage} alt={`${item.title} Hover`} className="icon-hover" />
               </motion.div>
-              <motion.div 
-                className="floating-icon icon-ezc"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.8 }}
-              >
-                <img src="/icons/EZC-Default.png" alt="EZC" className="icon-default" />
-                <img src="/icons/EZC-Hover.png" alt="EZC Hover" className="icon-hover" />
-              </motion.div>
-            </div>
-          {/* </div> */}
+            ))}
+          </div>
         </motion.div>
 
         <motion.div 
@@ -114,7 +108,13 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, onScrollDown }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <DownloadButton onClick={() => console.log('Download clicked')} />
+          <DownloadButton onClick={() => {
+            if (userInfo.portfolio) {
+              window.open(userInfo.portfolio, '_blank');
+            } else {
+              console.log('No portfolio URL available');
+            }
+          }} />
         </motion.div>
       </div>
 
