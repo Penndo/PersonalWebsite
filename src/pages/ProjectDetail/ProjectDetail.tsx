@@ -27,12 +27,16 @@ const ProjectDetail: React.FC = () => {
       
       setLoading(true);
       try {
+        console.log('Fetching project with id:', id);
         const data = await getProjectDetail(id);
+        console.log('Project data received:', data);
         setProject(data);
       } catch (error) {
         console.error('Failed to fetch project:', error);
+        // 即使出错也显示错误状态
       } finally {
         setLoading(false);
+        console.log('Fetch project completed');
       }
     };
 
@@ -80,6 +84,7 @@ const ProjectDetail: React.FC = () => {
         <Header />
         <div className="project-detail-error">
           <h2>项目未找到</h2>
+          <p>找不到ID为 {id} 的项目</p>
           <button onClick={handleBack}>返回列表</button>
         </div>
       </div>

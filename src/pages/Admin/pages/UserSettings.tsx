@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Tooltip } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { userApi, projectApi, articleApi, pluginApi, uploadApi } from '@/services/api';
+import { userApi, projectApi, articleApi, pluginApi, uploadApi, recommendationApi } from '@/services/api';
 import type { UserInfo, Project, Article, Plugin, RecommendedItem } from '@/types';
 
 const { TabPane } = Tabs;
@@ -13,6 +13,7 @@ const UserSettings: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [plugins, setPlugins] = useState<Plugin[]>([]);
+  const [editingItem, setEditingItem] = useState<RecommendedItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -24,47 +25,66 @@ const UserSettings: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [userRes, projectsRes, articlesRes, pluginsRes] = await Promise.all([
+      // 并行获取数据，但允许个别请求失败
+      const [userRes, projectsRes, articlesRes, pluginsRes, recommendationsRes] = await Promise.allSettled([
         userApi.getUserInfo(),
         projectApi.getProjects(),
         articleApi.getArticles(),
-        pluginApi.getPlugins()
+        pluginApi.getPlugins(),
+        recommendationApi.getRecommendations()
       ]);
       
-      setUserInfo({
-        ...userRes.data,
-        phone: userRes.data.phone || '',
-        portfolio: userRes.data.portfolio || '',
-        wechatQRCode: userRes.data.wechatQRCode || ''
-      });
-      setProjects(projectsRes.data);
-      setArticles(articlesRes.data);
-      setPlugins(pluginsRes.data);
+      // 处理用户信息
+      if (userRes.status === 'fulfilled') {
+        setUserInfo({
+          ...userRes.value.data,
+          phone: userRes.value.data.phone || '',
+          portfolio: userRes.value.data.portfolio || '',
+          wechatQRCode: userRes.value.data.wechatQRCode || ''
+        });
+      } else {
+        console.error('Failed to fetch user info:', userRes.reason);
+        message.warning('获取用户信息失败');
+      }
       
-      // 初始化推荐项目
-      setRecommendedItems([
-        {
-          id: '1',
-          type: 'project',
-          title: 'Hooinn',
-          defaultImage: '/icons/HooInn-Default.png',
-          hoverImage: '/icons/HooInn-hover.png',
-          enabled: true,
-          order: 1
-        },
-        {
-          id: '2',
-          type: 'project',
-          title: 'PUB',
-          defaultImage: '/icons/PUB-Default.png',
-          hoverImage: '/icons/PUB-Hover.png',
-          enabled: true,
-          order: 2
-        }
-      ]);
+      // 处理项目数据
+      if (projectsRes.status === 'fulfilled') {
+        setProjects(projectsRes.value.data);
+      } else {
+        console.error('Failed to fetch projects:', projectsRes.reason);
+        message.warning('获取项目数据失败');
+      }
+      
+      // 处理文章数据
+      if (articlesRes.status === 'fulfilled') {
+        setArticles(articlesRes.value.data);
+      } else {
+        console.error('Failed to fetch articles:', articlesRes.reason);
+        message.warning('获取文章数据失败');
+      }
+      
+      // 处理插件数据
+      if (pluginsRes.status === 'fulfilled') {
+        setPlugins(pluginsRes.value.data);
+      } else {
+        console.error('Failed to fetch plugins:', pluginsRes.reason);
+        message.warning('获取插件数据失败');
+      }
+      
+      // 处理推荐项目数据
+      if (recommendationsRes.status === 'fulfilled') {
+        setRecommendedItems(recommendationsRes.value.data);
+      } else {
+        console.error('Failed to fetch recommendations:', recommendationsRes.reason);
+        message.warning('获取推荐项目数据失败');
+        // 出错时使用空数组
+        setRecommendedItems([]);
+      }
     } catch (err) {
       console.error(err);
       message.error('获取数据失败');
+      // 出错时使用空数组
+      setRecommendedItems([]);
     } finally {
       setLoading(false);
     }
@@ -115,10 +135,35 @@ const UserSettings: React.FC = () => {
     }
   };
 
+  const handleAddToRecommendations = (item: Project | Article | Plugin) => {
+    const type = 'project' in item ? 'project' : 'article' in item ? 'article' : 'plugin';
+    const newRecommendedItem: RecommendedItem = {
+      id: item.id.toString(),
+      type: type as 'project' | 'article' | 'plugin',
+      title: item.title,
+      defaultImage: item.cover || `/${type}s/${item.title.toLowerCase()}-default.png`,
+      hoverImage: item.cover || `/${type}s/${item.title.toLowerCase()}-hover.png`,
+      enabled: true,
+      order: recommendedItems.length + 1
+    };
+    setRecommendedItems([...recommendedItems, newRecommendedItem]);
+  };
+
+  const handleRemoveFromRecommendations = (id: string) => {
+    setRecommendedItems(recommendedItems.filter(item => item.id !== id));
+  };
+
+  const handleEditRecommendation = (item: RecommendedItem) => {
+    setEditingItem(item);
+    // 这里可以添加编辑模态框的逻辑
+    message.info('编辑功能开发中');
+  };
+
   const handleSaveRecommendations = async () => {
     setSaving(true);
     try {
-      // 这里需要实现保存推荐项目的API调用
+      // 调用API保存推荐项目配置
+      await recommendationApi.saveRecommendations(recommendedItems);
       message.success('推荐项目配置已保存');
     } catch (err) {
       console.error(err);
@@ -292,7 +337,35 @@ const UserSettings: React.FC = () => {
                 {projects.map(project => (
                   <Card key={project.id} size="small" title={project.title}>
                     <p>{project.summary}</p>
-                    <Button type="primary" style={{ marginTop: '12px' }}>
+                    <Button 
+                      type="primary" 
+                      style={{ marginTop: '12px' }}
+                      onClick={() => handleAddToRecommendations(project)}
+                    >
+                      添加到推荐
+                    </Button>
+                  </Card>
+                ))}
+                {articles.map(article => (
+                  <Card key={article.id} size="small" title={article.title}>
+                    <p>{article.summary}</p>
+                    <Button 
+                      type="primary" 
+                      style={{ marginTop: '12px' }}
+                      onClick={() => handleAddToRecommendations(article)}
+                    >
+                      添加到推荐
+                    </Button>
+                  </Card>
+                ))}
+                {plugins.map(plugin => (
+                  <Card key={plugin.id} size="small" title={plugin.title}>
+                    <p>{plugin.summary}</p>
+                    <Button 
+                      type="primary" 
+                      style={{ marginTop: '12px' }}
+                      onClick={() => handleAddToRecommendations(plugin)}
+                    >
                       添加到推荐
                     </Button>
                   </Card>
@@ -310,8 +383,19 @@ const UserSettings: React.FC = () => {
                       <p>类型: {item.type}</p>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <Button type="link">编辑</Button>
-                      <Button type="link" danger>删除</Button>
+                      <Button 
+                        type="link"
+                        onClick={() => handleEditRecommendation(item)}
+                      >
+                        编辑
+                      </Button>
+                      <Button 
+                        type="link" 
+                        danger
+                        onClick={() => handleRemoveFromRecommendations(item.id)}
+                      >
+                        删除
+                      </Button>
                     </div>
                   </div>
                 </Card>

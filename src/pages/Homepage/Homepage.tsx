@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Header, DownloadButton } from '@/components';
 import type { UserInfo, RecommendedItem } from '@/types';
 import './Homepage.less';
@@ -10,12 +11,31 @@ interface HomepageProps {
 }
 
 const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], onScrollDown }) => {
+  const navigate = useNavigate();
+  
   // 按顺序排序推荐项目
   const sortedItems = [...recommendedItems].sort((a, b) => a.order - b.order);
   
   // 分为左右两列
   const leftItems = sortedItems.filter((_, index) => index % 2 === 0);
   const rightItems = sortedItems.filter((_, index) => index % 2 === 1);
+  
+  // 处理推荐项目点击
+  const handleRecommendedItemClick = (item: RecommendedItem) => {
+    switch (item.type) {
+      case 'project':
+        navigate(`/project/${item.id}`);
+        break;
+      case 'article':
+        navigate(`/article/${item.id}`);
+        break;
+      case 'plugin':
+        navigate(`/plugin/${item.id}`);
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <section className="homepage">
@@ -70,6 +90,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], on
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                onClick={() => handleRecommendedItemClick(item)}
               >
                 <img src={item.defaultImage} alt={item.title} className="icon-default" />
                 <img src={item.hoverImage} alt={`${item.title} Hover`} className="icon-hover" />
@@ -94,6 +115,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], on
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+                onClick={() => handleRecommendedItemClick(item)}
               >
                 <img src={item.defaultImage} alt={item.title} className="icon-default" />
                 <img src={item.hoverImage} alt={`${item.title} Hover`} className="icon-hover" />

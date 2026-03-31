@@ -8,6 +8,7 @@ import type {
   Plugin,
   PluginDetail,
   TabType,
+  RecommendedItem,
 } from '@/types';
 import {
   mockProjectDetail,
@@ -68,6 +69,69 @@ export const pluginApi = {
   createPlugin: (data: Partial<Plugin>) => api.post<Plugin>('/plugins', data),
   updatePlugin: (id: string, data: Partial<Plugin>) => api.put<Plugin>(`/plugins/${id}`, data),
   deletePlugin: (id: string) => api.delete(`/plugins/${id}`),
+};
+
+export const recommendationApi = {
+  getRecommendations: () => api.get<Array<{
+    id: number;
+    itemId: string;
+    itemType: 'project' | 'article' | 'plugin';
+    title: string;
+    defaultImage: string;
+    hoverImage: string;
+    enabled: boolean;
+    order: number;
+  }>>('/recommendations').then(res => {
+    // 转换数据结构为前端期望的格式
+    return {
+      ...res,
+      data: res.data.map(item => ({
+        id: item.itemId,
+        type: item.itemType,
+        title: item.title,
+        defaultImage: item.defaultImage,
+        hoverImage: item.hoverImage,
+        enabled: item.enabled,
+        order: item.order
+      }))
+    };
+  }),
+  saveRecommendations: (data: RecommendedItem[]) => {
+    // 转换数据结构为后端期望的格式
+    const transformedData = data.map(item => ({
+      itemId: item.id,
+      itemType: item.type,
+      title: item.title,
+      defaultImage: item.defaultImage,
+      hoverImage: item.hoverImage,
+      enabled: item.enabled,
+      order: item.order
+    }));
+    return api.post<Array<{
+      id: number;
+      itemId: string;
+      itemType: 'project' | 'article' | 'plugin';
+      title: string;
+      defaultImage: string;
+      hoverImage: string;
+      enabled: boolean;
+      order: number;
+    }>>('/recommendations/batch', transformedData).then(res => {
+      // 转换数据结构为前端期望的格式
+      return {
+        ...res,
+        data: res.data.map(item => ({
+          id: item.itemId,
+          type: item.itemType,
+          title: item.title,
+          defaultImage: item.defaultImage,
+          hoverImage: item.hoverImage,
+          enabled: item.enabled,
+          order: item.order
+        }))
+      };
+    });
+  },
 };
 
 export const uploadApi = {
