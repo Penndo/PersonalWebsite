@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Tooltip } from 'antd';
+import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Tooltip, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { userApi, projectApi, articleApi, pluginApi, uploadApi, recommendationApi } from '@/services/api';
 import type { UserInfo, Project, Article, Plugin, RecommendedItem } from '@/types';
@@ -14,6 +14,8 @@ const UserSettings: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [plugins, setPlugins] = useState<Plugin[]>([]);
   const [editingItem, setEditingItem] = useState<RecommendedItem | null>(null);
+  const [editForm] = Form.useForm();
+  const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -136,13 +138,57 @@ const UserSettings: React.FC = () => {
   };
 
   const handleAddToRecommendations = (item: Project | Article | Plugin) => {
-    const type = 'project' in item ? 'project' : 'article' in item ? 'article' : 'plugin';
+    // 正确判断项目类型
+    let type: 'project' | 'article' | 'plugin' = 'plugin';
+    
+    // 检查是否为项目
+    if ('content' in item && !('version' in item) && !('date' in item)) {
+      type = 'project';
+    } 
+    // 检查是否为文章
+    else if ('date' in item || ('content' in item && 'author' in item)) {
+      type = 'article';
+    } 
+    // 检查是否为插件
+    else if ('version' in item || 'link' in item || 'downloads' in item || 'repositoryUrl' in item || 'downloadUrl' in item) {
+      type = 'plugin';
+    }
+    
+    // 特殊处理已知项目
+    if (item.title === 'Hooinn' || item.title === 'PUB' || item.title === '开运' || item.title === 'EZC') {
+      type = 'project';
+    }
+    // 生成正确的默认图片路径
+    let defaultImage = item.coverUrl;
+    let hoverImage = item.coverUrl;
+    
+    if (!defaultImage) {
+      // 使用正确的图标文件路径和格式
+      if (item.title.toLowerCase() === 'hooinn') {
+        defaultImage = '/icons/HooInn-Default.png';
+        hoverImage = '/icons/HooInn-hover.png';
+      } else if (item.title.toLowerCase() === 'pub') {
+        defaultImage = '/icons/PUB-Default.png';
+        hoverImage = '/icons/PUB-Hover.png';
+      } else if (item.title.toLowerCase() === 'ezc') {
+        defaultImage = '/icons/EZC-Default.png';
+        hoverImage = '/icons/EZC-Hover.png';
+      } else if (item.title === '开运') {
+        defaultImage = '/icons/开运-Default.png';
+        hoverImage = '/icons/开运-hover.png';
+      } else {
+        // 对于其他项目，使用通用格式
+        defaultImage = `/icons/${item.title}-Default.png`;
+        hoverImage = `/icons/${item.title}-Hover.png`;
+      }
+    }
+    
     const newRecommendedItem: RecommendedItem = {
       id: item.id.toString(),
       type: type as 'project' | 'article' | 'plugin',
       title: item.title,
-      defaultImage: item.cover || `/${type}s/${item.title.toLowerCase()}-default.png`,
-      hoverImage: item.cover || `/${type}s/${item.title.toLowerCase()}-hover.png`,
+      defaultImage,
+      hoverImage: hoverImage || '',
       enabled: true,
       order: recommendedItems.length + 1
     };
@@ -155,8 +201,31 @@ const UserSettings: React.FC = () => {
 
   const handleEditRecommendation = (item: RecommendedItem) => {
     setEditingItem(item);
-    // 这里可以添加编辑模态框的逻辑
-    message.info('编辑功能开发中');
+    // 填充表单数据
+    editForm.setFieldsValue({
+      title: item.title,
+      defaultImage: item.defaultImage,
+      hoverImage: item.hoverImage,
+      enabled: item.enabled,
+      order: item.order
+    });
+    // 打开模态框
+    setModalVisible(true);
+  };
+
+  const handleSaveRecommendationEdit = async (values: any) => {
+    if (!editingItem) return;
+    
+    // 更新推荐项目，保留原始类型信息
+    const updatedItems = recommendedItems.map(item => 
+      item.id === editingItem.id 
+        ? { ...item, ...values, type: item.type } // 保留原始类型
+        : item
+    );
+    
+    setRecommendedItems(updatedItems);
+    setModalVisible(false);
+    message.success('编辑成功');
   };
 
   const handleSaveRecommendations = async () => {
@@ -410,6 +479,93 @@ const UserSettings: React.FC = () => {
           </Card>
         </TabPane>
       </Tabs>
+      
+      {/* 编辑推荐项目模态框 */}
+      <Modal
+        title="编辑推荐项目"
+        open={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+      >
+        <Form
+          form={editForm}
+          layout="vertical"
+          onFinish={handleSaveRecommendationEdit}
+        >
+          <Form.Item label="标题" name="title" rules={[{ required: true, message: '请输入标题' }]}>
+            <Input placeholder="请输入推荐项目标题" />
+          </Form.Item>
+          
+          <Form.Item label="默认图片" name="defaultImage" rules={[{ required: true}]}>
+            <Upload
+              name="file"
+              listType="picture"
+              maxCount={1}
+              beforeUpload={(file) => {
+                if (file.size > 5 * 1024 * 1024) {
+                  message.error('文件大小不能超过 5MB');
+                  return false;
+                }
+                uploadApi.uploadImage(file)
+                  .then(response => {
+                    editForm.setFieldsValue({ defaultImage: response.data.url });
+                    message.success('上传成功');
+                  })
+                  .catch(error => {
+                    console.error('Upload failed:', error);
+                    message.error('上传失败，请重试');
+                  });
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>上传图片</Button>
+            </Upload>
+          </Form.Item>
+          
+          <Form.Item label="悬停图片" name="hoverImage" rules={[{ required: true}]}>
+            <Upload
+              name="file"
+              listType="picture"
+              maxCount={1}
+              beforeUpload={(file) => {
+                if (file.size > 5 * 1024 * 1024) {
+                  message.error('文件大小不能超过 5MB');
+                  return false;
+                }
+                uploadApi.uploadImage(file)
+                  .then(response => {
+                    editForm.setFieldsValue({ hoverImage: response.data.url });
+                    message.success('上传成功');
+                  })
+                  .catch(error => {
+                    console.error('Upload failed:', error);
+                    message.error('上传失败，请重试');
+                  });
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>上传图片</Button>
+            </Upload>
+          </Form.Item>
+          
+          <Form.Item label="启用" name="enabled" valuePropName="checked">
+            <Input type="checkbox" />
+          </Form.Item>
+          
+          <Form.Item label="排序" name="order" rules={[{ required: true, message: '请输入排序值' }]}>
+            <InputNumber min={1} style={{ width: '100%' }} placeholder="请输入排序值" />
+          </Form.Item>
+          
+          <Form.Item style={{ textAlign: 'right' }}>
+            <Button onClick={() => setModalVisible(false)} style={{ marginRight: '8px' }}>
+              取消
+            </Button>
+            <Button type="primary" htmlType="submit">
+              保存
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

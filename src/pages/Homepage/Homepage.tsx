@@ -92,8 +92,16 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], on
                 transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
                 onClick={() => handleRecommendedItemClick(item)}
               >
-                <img src={item.defaultImage} alt={item.title} className="icon-default" />
-                <img src={item.hoverImage} alt={`${item.title} Hover`} className="icon-hover" />
+                <img 
+                  src={item.defaultImage} 
+                  alt={item.title} 
+                  className="icon-default" 
+                />
+                <img 
+                  src={item.hoverImage} 
+                  alt={`${item.title} Hover`} 
+                  className="icon-hover" 
+                />
               </motion.div>
             ))}
           </div>
@@ -117,8 +125,54 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], on
                 transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
                 onClick={() => handleRecommendedItemClick(item)}
               >
-                <img src={item.defaultImage} alt={item.title} className="icon-default" />
-                <img src={item.hoverImage} alt={`${item.title} Hover`} className="icon-hover" />
+                <img 
+                  src={item.defaultImage} 
+                  alt={item.title} 
+                  className="icon-default" 
+                  onError={(e) => {
+                    console.error('Default image load error:', item.defaultImage);
+                    const target = e.target as HTMLImageElement;
+                    // 移除onError事件监听器，避免死循环
+                    target.onerror = null;
+                    // 设置备用图片，使用正确的文件名格式
+                    let fallbackImage = `/icons/${item.title}-Default.png`;
+                    // 特殊处理已知的图标文件
+                    if (item.title.toLowerCase() === 'hooinn') {
+                      fallbackImage = '/icons/HooInn-Default.png';
+                    } else if (item.title.toLowerCase() === 'pub') {
+                      fallbackImage = '/icons/PUB-Default.png';
+                    } else if (item.title.toLowerCase() === 'ezc') {
+                      fallbackImage = '/icons/EZC-Default.png';
+                    } else if (item.title === '开运') {
+                      fallbackImage = '/icons/开运-Default.png';
+                    }
+                    target.src = fallbackImage;
+                  }}
+                />
+                <img 
+                  src={item.hoverImage} 
+                  alt={`${item.title} Hover`} 
+                  className="icon-hover" 
+                  onError={(e) => {
+                    console.error('Hover image load error:', item.hoverImage);
+                    const target = e.target as HTMLImageElement;
+                    // 移除onError事件监听器，避免死循环
+                    target.onerror = null;
+                    // 设置备用图片，使用正确的文件名格式
+                    let fallbackImage = `/icons/${item.title}-Hover.png`;
+                    // 特殊处理已知的图标文件
+                    if (item.title.toLowerCase() === 'hooinn') {
+                      fallbackImage = '/icons/HooInn-hover.png';
+                    } else if (item.title.toLowerCase() === 'pub') {
+                      fallbackImage = '/icons/PUB-Hover.png';
+                    } else if (item.title.toLowerCase() === 'ezc') {
+                      fallbackImage = '/icons/EZC-Hover.png';
+                    } else if (item.title === '开运') {
+                      fallbackImage = '/icons/开运-hover.png';
+                    }
+                    target.src = fallbackImage;
+                  }}
+                />
               </motion.div>
             ))}
           </div>
