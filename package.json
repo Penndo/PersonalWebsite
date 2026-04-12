@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/react-syntax-highlighter": "^15.5.13",
     "antd": "^6.3.2",
+    "antd-img-crop": "^4.30.0",
     "axios": "^1.13.6",
     "browser-image-compression": "^2.0.2",
     "framer-motion": "^12.35.0",

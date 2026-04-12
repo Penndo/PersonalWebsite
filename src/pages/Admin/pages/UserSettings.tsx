@@ -1,10 +1,94 @@
 import { useEffect, useState } from 'react';
-import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Tooltip, Modal } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Modal, Select, UploadFile } from 'antd';
+const { Option, OptGroup } = Select;
+import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { userApi, projectApi, articleApi, pluginApi, uploadApi, recommendationApi } from '@/services/api';
 import type { UserInfo, Project, Article, Plugin, RecommendedItem } from '@/types';
+// @ts-ignore
+import ImgCrop from 'antd-img-crop';
 
 const { TabPane } = Tabs;
+
+/** 用表单字段存图片 URL，通过 value/onChange 与 Form 绑定，保证上传后与再次打开时的预览、回显正常 */
+type RecommendationImageUploadProps = {
+  value?: string;
+  onChange?: (url: string) => void;
+  crop?: boolean;
+};
+
+const RecommendationImageUpload: React.FC<RecommendationImageUploadProps> = ({
+  value,
+  onChange,
+  crop,
+}) => {
+  const fileList: UploadFile[] = value
+    ? [
+        {
+          uid: '-1',
+          name: value.split('/').pop() || 'image.png',
+          status: 'done',
+          url: value,
+          thumbUrl: value,
+        },
+      ]
+    : [];
+
+  const upload = (
+    <Upload
+      name="file"
+      listType="picture-card"
+      fileList={fileList}
+      maxCount={1}
+      accept="image/*"
+      onChange={({ fileList: next }) => {
+        if (next.length === 0) {
+          onChange?.('');
+        }
+      }}
+      beforeUpload={(file) => {
+        if (file.size > 5 * 1024 * 1024) {
+          message.error('文件大小不能超过 5MB');
+          return false;
+        }
+        uploadApi
+          .uploadImage(file)
+          .then((response) => {
+            onChange?.(response.data.url);
+            message.success('上传成功');
+          })
+          .catch((error) => {
+            console.error('Upload failed:', error);
+            message.error('上传失败，请重试');
+          });
+        return false;
+      }}
+      onRemove={() => {
+        onChange?.('');
+      }}
+    >
+      {fileList.length === 0 && (
+        <div
+          style={{
+            width: '100px',
+            height: '100px',
+            border: '1px dashed #d9d9d9',
+            borderRadius: '4px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <PlusOutlined />
+          <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
+      )}
+    </Upload>
+  );
+
+  return crop ? <ImgCrop>{upload}</ImgCrop> : upload;
+};
 
 const UserSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('basic');
@@ -137,95 +221,80 @@ const UserSettings: React.FC = () => {
     }
   };
 
-  const handleAddToRecommendations = (item: Project | Article | Plugin) => {
-    // 正确判断项目类型
-    let type: 'project' | 'article' | 'plugin' = 'plugin';
-    
-    // 检查是否为项目
-    if ('content' in item && !('version' in item) && !('date' in item)) {
-      type = 'project';
-    } 
-    // 检查是否为文章
-    else if ('date' in item || ('content' in item && 'author' in item)) {
-      type = 'article';
-    } 
-    // 检查是否为插件
-    else if ('version' in item || 'link' in item || 'downloads' in item || 'repositoryUrl' in item || 'downloadUrl' in item) {
-      type = 'plugin';
-    }
-    
-    // 特殊处理已知项目
-    if (item.title === 'Hooinn' || item.title === 'PUB' || item.title === '开运' || item.title === 'EZC') {
-      type = 'project';
-    }
-    // 生成正确的默认图片路径
-    let defaultImage = item.coverUrl;
-    let hoverImage = item.coverUrl;
-    
-    if (!defaultImage) {
-      // 使用正确的图标文件路径和格式
-      if (item.title.toLowerCase() === 'hooinn') {
-        defaultImage = '/icons/HooInn-Default.png';
-        hoverImage = '/icons/HooInn-hover.png';
-      } else if (item.title.toLowerCase() === 'pub') {
-        defaultImage = '/icons/PUB-Default.png';
-        hoverImage = '/icons/PUB-Hover.png';
-      } else if (item.title.toLowerCase() === 'ezc') {
-        defaultImage = '/icons/EZC-Default.png';
-        hoverImage = '/icons/EZC-Hover.png';
-      } else if (item.title === '开运') {
-        defaultImage = '/icons/开运-Default.png';
-        hoverImage = '/icons/开运-hover.png';
-      } else {
-        // 对于其他项目，使用通用格式
-        defaultImage = `/icons/${item.title}-Default.png`;
-        hoverImage = `/icons/${item.title}-Hover.png`;
-      }
-    }
-    
-    const newRecommendedItem: RecommendedItem = {
-      id: item.id.toString(),
-      type: type as 'project' | 'article' | 'plugin',
-      title: item.title,
-      defaultImage,
-      hoverImage: hoverImage || '',
-      enabled: true,
-      order: recommendedItems.length + 1
-    };
-    setRecommendedItems([...recommendedItems, newRecommendedItem]);
-  };
 
   const handleRemoveFromRecommendations = (id: string) => {
     setRecommendedItems(recommendedItems.filter(item => item.id !== id));
   };
 
-  const handleEditRecommendation = (item: RecommendedItem) => {
-    setEditingItem(item);
-    // 填充表单数据
-    editForm.setFieldsValue({
-      title: item.title,
-      defaultImage: item.defaultImage,
-      hoverImage: item.hoverImage,
-      enabled: item.enabled,
-      order: item.order
-    });
-    // 打开模态框
-    setModalVisible(true);
-  };
-
   const handleSaveRecommendationEdit = async (values: any) => {
-    if (!editingItem) return;
-    
-    // 更新推荐项目，保留原始类型信息
-    const updatedItems = recommendedItems.map(item => 
-      item.id === editingItem.id 
-        ? { ...item, ...values, type: item.type } // 保留原始类型
-        : item
-    );
-    
-    setRecommendedItems(updatedItems);
-    setModalVisible(false);
-    message.success('编辑成功');
+    if (editingItem) {
+      // 编辑现有项目
+      const updatedItems = recommendedItems.map(item => 
+        item.id === editingItem.id 
+          ? { ...item, ...values, type: item.type } // 保留原始类型
+          : item
+      );
+      
+      setRecommendedItems(updatedItems);
+      setModalVisible(false);
+      setEditingItem(null);
+      editForm.resetFields();
+      message.success('编辑成功');
+    } else {
+      // 添加新项目
+      const { itemId, defaultImage, hoverImage } = values;
+      if (!itemId) {
+        message.error('请选择项目');
+        return;
+      }
+      
+      // 解析itemId格式：type-id
+      const [type, id] = itemId.split('-');
+      if (!type || !id) {
+        message.error('项目选择格式错误');
+        return;
+      }
+      
+      // 找到对应的项目、文章或插件
+      let title = '';
+      if (type === 'project') {
+        const project = projects.find(p => p.id.toString() === id);
+        if (project) title = project.title;
+      } else if (type === 'article') {
+        const article = articles.find(a => a.id.toString() === id);
+        if (article) title = article.title;
+      } else if (type === 'plugin') {
+        const plugin = plugins.find(p => p.id.toString() === id);
+        if (plugin) title = plugin.title;
+      }
+      
+      if (!title) {
+        message.error('未找到选中的项目');
+        return;
+      }
+      
+      // 创建新的推荐项目
+      const newRecommendedItem: RecommendedItem = {
+        id: id,
+        type: type as 'project' | 'article' | 'plugin',
+        title: title,
+        defaultImage: defaultImage || '',
+        hoverImage: hoverImage || '',
+        enabled: true,
+        order: recommendedItems.length + 1
+      };
+      
+      // 检查是否已存在
+      if (recommendedItems.some(item => item.id === id && item.type === type)) {
+        message.error('该项目已在推荐列表中');
+        return;
+      }
+      
+      setRecommendedItems([...recommendedItems, newRecommendedItem]);
+      setModalVisible(false);
+      editForm.resetFields();
+      message.success('添加成功');
+    }
   };
 
   const handleSaveRecommendations = async () => {
@@ -393,167 +462,136 @@ const UserSettings: React.FC = () => {
             )}
           </Card>
         </TabPane>
-        <TabPane tab="推荐项目配置" key="recommendations">
-          <Card title="推荐项目设置">
-            <div style={{ marginBottom: '24px' }}>
-              <h3>推荐项目列表</h3>
-              <p>从以下项目中选择推荐项目，并配置默认图片和悬停图片</p>
-            </div>
-            
-            <div style={{ marginBottom: '32px' }}>
-              <h4>可选项目</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-                {projects.map(project => (
-                  <Card key={project.id} size="small" title={project.title}>
-                    <p>{project.summary}</p>
-                    <Button 
-                      type="primary" 
-                      style={{ marginTop: '12px' }}
-                      onClick={() => handleAddToRecommendations(project)}
-                    >
-                      添加到推荐
-                    </Button>
-                  </Card>
-                ))}
-                {articles.map(article => (
-                  <Card key={article.id} size="small" title={article.title}>
-                    <p>{article.summary}</p>
-                    <Button 
-                      type="primary" 
-                      style={{ marginTop: '12px' }}
-                      onClick={() => handleAddToRecommendations(article)}
-                    >
-                      添加到推荐
-                    </Button>
-                  </Card>
-                ))}
-                {plugins.map(plugin => (
-                  <Card key={plugin.id} size="small" title={plugin.title}>
-                    <p>{plugin.summary}</p>
-                    <Button 
-                      type="primary" 
-                      style={{ marginTop: '12px' }}
-                      onClick={() => handleAddToRecommendations(plugin)}
-                    >
-                      添加到推荐
-                    </Button>
-                  </Card>
-                ))}
+        <TabPane tab="推荐内容" key="recommendations">
+          <Card title="推荐内容设置">
+            <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>推荐内容列表</h3>
+              <div>
+                <Button type="primary" onClick={() => setModalVisible(true)}>
+                  新增内容
+                </Button>
+                <Button style={{ marginLeft: '8px' }} onClick={handleSaveRecommendations} loading={saving}>
+                  保存配置
+                </Button>
               </div>
             </div>
             
-            <div>
-              <h4>已推荐项目</h4>
-              {recommendedItems.map(item => (
-                <Card key={item.id} style={{ marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <h5>{item.title}</h5>
-                      <p>类型: {item.type}</p>
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <Button 
-                        type="link"
-                        onClick={() => handleEditRecommendation(item)}
-                      >
-                        编辑
-                      </Button>
-                      <Button 
-                        type="link" 
-                        danger
-                        onClick={() => handleRemoveFromRecommendations(item.id)}
-                      >
-                        删除
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #e8e8e8' }}>
+                    <th style={{ padding: '12px', textAlign: 'left' }}>内容</th>
+                    <th style={{ padding: '12px', textAlign: 'left' }}>类型</th>
+                    <th style={{ padding: '12px', textAlign: 'left' }}>路由</th>
+                    <th style={{ padding: '12px', textAlign: 'left' }}>Default图片</th>
+                    <th style={{ padding: '12px', textAlign: 'left' }}>Hover图片</th>
+                    <th style={{ padding: '12px', textAlign: 'left' }}>启用</th>
+                    <th style={{ padding: '12px', textAlign: 'left' }}>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recommendedItems.map(item => (
+                    <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                      <td style={{ padding: '12px' }}>{item.title}</td>
+                      <td style={{ padding: '12px' }}>{item.type === 'project' ? '项目' : item.type === 'article' ? '文章' : '插件'}</td>
+                      <td style={{ padding: '12px' }}>{item.id}</td>
+                      <td style={{ padding: '12px' }}>{item.defaultImage ? '✓' : '✗'}</td>
+                      <td style={{ padding: '12px' }}>{item.hoverImage ? '✓' : '✗'}</td>
+                      <td style={{ padding: '12px' }}>
+                        <input 
+                          type="checkbox" 
+                          checked={item.enabled} 
+                          onChange={(e) => {
+                            const updatedItems = recommendedItems.map(i => 
+                              i.id === item.id ? { ...i, enabled: e.target.checked } : i
+                            );
+                            setRecommendedItems(updatedItems);
+                          }}
+                        />
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <Button 
+                          type="link" 
+                          onClick={() => {
+                            setEditingItem(item);
+                            editForm.setFieldsValue({
+                              itemId: `${item.type}-${item.id}`,
+                              defaultImage: item.defaultImage,
+                              hoverImage: item.hoverImage
+                            });
+                            setModalVisible(true);
+                          }}
+                        >
+                          编辑
+                        </Button>
+                        <Button 
+                          type="link" 
+                          danger
+                          onClick={() => handleRemoveFromRecommendations(item.id)}
+                        >
+                          删除
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            
-            <Form.Item style={{ marginTop: '24px' }}>
-              <Button type="primary" onClick={handleSaveRecommendations} loading={saving}>
-                保存推荐项目配置
-              </Button>
-            </Form.Item>
           </Card>
         </TabPane>
       </Tabs>
       
       {/* 编辑推荐项目模态框 */}
       <Modal
-        title="编辑推荐项目"
+        title={editingItem ? "编辑推荐项目" : "添加推荐项目"}
         open={modalVisible}
-        onCancel={() => setModalVisible(false)}
+        onCancel={() => {
+          setModalVisible(false);
+          setEditingItem(null);
+          editForm.resetFields();
+        }}
         footer={null}
       >
         <Form
           form={editForm}
-          layout="vertical"
           onFinish={handleSaveRecommendationEdit}
+          layout="vertical"
         >
-          <Form.Item label="标题" name="title" rules={[{ required: true, message: '请输入标题' }]}>
-            <Input placeholder="请输入推荐项目标题" />
+          <Form.Item label="项目" name="itemId" rules={[{ required: true, message: '请选择项目' }]}>
+            <Select placeholder="请选择">
+              <Option value="">请选择</Option>
+              <OptGroup label="项目">
+                {projects.map(project => (
+                  <Option key={project.id} value={`project-${project.id}`}>{project.title}</Option>
+                ))}
+              </OptGroup>
+              <OptGroup label="文章">
+                {articles.map(article => (
+                  <Option key={article.id} value={`article-${article.id}`}>{article.title}</Option>
+                ))}
+              </OptGroup>
+              <OptGroup label="插件">
+                {plugins.map(plugin => (
+                  <Option key={plugin.id} value={`plugin-${plugin.id}`}>{plugin.title}</Option>
+                ))}
+              </OptGroup>
+            </Select>
           </Form.Item>
           
-          <Form.Item label="默认图片" name="defaultImage" rules={[{ required: true}]}>
-            <Upload
-              name="file"
-              listType="picture"
-              maxCount={1}
-              beforeUpload={(file) => {
-                if (file.size > 5 * 1024 * 1024) {
-                  message.error('文件大小不能超过 5MB');
-                  return false;
-                }
-                uploadApi.uploadImage(file)
-                  .then(response => {
-                    editForm.setFieldsValue({ defaultImage: response.data.url });
-                    message.success('上传成功');
-                  })
-                  .catch(error => {
-                    console.error('Upload failed:', error);
-                    message.error('上传失败，请重试');
-                  });
-                return false;
-              }}
-            >
-              <Button icon={<UploadOutlined />}>上传图片</Button>
-            </Upload>
+          <Form.Item
+            name="defaultImage"
+            label="默认图片"
+            rules={[{ required: true, message: '请上传默认图片' }]}
+          >
+            <RecommendationImageUpload />
           </Form.Item>
-          
-          <Form.Item label="悬停图片" name="hoverImage" rules={[{ required: true}]}>
-            <Upload
-              name="file"
-              listType="picture"
-              maxCount={1}
-              beforeUpload={(file) => {
-                if (file.size > 5 * 1024 * 1024) {
-                  message.error('文件大小不能超过 5MB');
-                  return false;
-                }
-                uploadApi.uploadImage(file)
-                  .then(response => {
-                    editForm.setFieldsValue({ hoverImage: response.data.url });
-                    message.success('上传成功');
-                  })
-                  .catch(error => {
-                    console.error('Upload failed:', error);
-                    message.error('上传失败，请重试');
-                  });
-                return false;
-              }}
-            >
-              <Button icon={<UploadOutlined />}>上传图片</Button>
-            </Upload>
-          </Form.Item>
-          
-          <Form.Item label="启用" name="enabled" valuePropName="checked">
-            <Input type="checkbox" />
-          </Form.Item>
-          
-          <Form.Item label="排序" name="order" rules={[{ required: true, message: '请输入排序值' }]}>
-            <InputNumber min={1} style={{ width: '100%' }} placeholder="请输入排序值" />
+
+          <Form.Item
+            name="hoverImage"
+            label="悬停图片"
+            rules={[{ required: true, message: '请上传悬停图片' }]}
+          >
+            <RecommendationImageUpload />
           </Form.Item>
           
           <Form.Item style={{ textAlign: 'right' }}>
