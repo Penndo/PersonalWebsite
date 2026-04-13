@@ -321,9 +321,28 @@ const UserSettings: React.FC = () => {
 
   return (
     <div style={{ padding: '24px 48px' }}>
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
+      <Card bordered styles={{ body: { padding: 0 } }}>
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          tabBarStyle={{ margin: 0 }}
+          renderTabBar={(props, DefaultTabBar) => (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 56,
+                padding: '0 24px',
+                borderBottom: '1px solid #f0f0f0',
+              }}
+            >
+              <DefaultTabBar {...props} />
+            </div>
+          )}
+        >
         <TabPane tab="基础信息配置" key="basic">
-          <Card title="个人信息">
+          <div style={{ padding: 24 }}>
+          <Card styles={{ body: { padding: 0} }}>
             {userInfo && (
               <Form layout="vertical">
                 <Form.Item label="姓名" required>
@@ -461,21 +480,27 @@ const UserSettings: React.FC = () => {
               </Form>
             )}
           </Card>
+          </div>
         </TabPane>
         <TabPane tab="推荐内容" key="recommendations">
-          <Card title="推荐内容设置">
-            <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3>推荐内容列表</h3>
-              <div>
-                <Button type="primary" onClick={() => setModalVisible(true)}>
-                  新增内容
-                </Button>
-                <Button style={{ marginLeft: '8px' }} onClick={handleSaveRecommendations} loading={saving}>
-                  保存配置
-                </Button>
-              </div>
+          <div style={{ padding: 24 }}>
+            <div
+              style={{
+                marginBottom: 16,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <Button type="primary" onClick={() => setModalVisible(true)}>
+                新增内容
+              </Button>
+              <Button onClick={handleSaveRecommendations} loading={saving}>
+                保存配置
+              </Button>
             </div>
-            
+
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
@@ -537,10 +562,11 @@ const UserSettings: React.FC = () => {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </div>
         </TabPane>
       </Tabs>
-      
+      </Card>
+
       {/* 编辑推荐项目模态框 */}
       <Modal
         title={editingItem ? "编辑推荐项目" : "添加推荐项目"}
@@ -559,20 +585,25 @@ const UserSettings: React.FC = () => {
         >
           <Form.Item label="项目" name="itemId" rules={[{ required: true, message: '请选择项目' }]}>
             <Select placeholder="请选择">
-              <Option value="">请选择</Option>
               <OptGroup label="项目">
-                {projects.map(project => (
-                  <Option key={project.id} value={`project-${project.id}`}>{project.title}</Option>
+                {projects.map((project) => (
+                  <Option key={`project-${project.id}`} value={`project-${project.id}`}>
+                    {project.title}
+                  </Option>
                 ))}
               </OptGroup>
               <OptGroup label="文章">
-                {articles.map(article => (
-                  <Option key={article.id} value={`article-${article.id}`}>{article.title}</Option>
+                {articles.map((article) => (
+                  <Option key={`article-${article.id}`} value={`article-${article.id}`}>
+                    {article.title}
+                  </Option>
                 ))}
               </OptGroup>
               <OptGroup label="插件">
-                {plugins.map(plugin => (
-                  <Option key={plugin.id} value={`plugin-${plugin.id}`}>{plugin.title}</Option>
+                {plugins.map((plugin) => (
+                  <Option key={`plugin-${plugin.id}`} value={`plugin-${plugin.id}`}>
+                    {plugin.title}
+                  </Option>
                 ))}
               </OptGroup>
             </Select>

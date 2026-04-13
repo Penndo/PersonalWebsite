@@ -248,6 +248,27 @@
       transform: translate(0, 0) scale(1);
     }
   }
+
+  /* 未配置 hover 图时不再渲染空 <img>；悬停时仍需保留默认图可见 */
+  &.floating-icon--no-hover-image:hover {
+    .icon-default {
+      opacity: 1;
+    }
+    .icon-hover {
+      opacity: 0;
+    }
+  }
+
+  /* 仅有 hover 图、无默认图时，常态下也应显示 hover 图 */
+  &.floating-icon--no-default-image {
+    .icon-hover {
+      opacity: 1;
+    }
+
+    &:hover .icon-hover {
+      opacity: 1;
+    }
+  }
 }
 
 .icon-hooinn {
