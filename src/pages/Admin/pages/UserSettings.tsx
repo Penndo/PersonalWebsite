@@ -4,6 +4,7 @@ const { Option, OptGroup } = Select;
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { userApi, projectApi, articleApi, pluginApi, uploadApi, recommendationApi } from '@/services/api';
 import type { UserInfo, Project, Article, Plugin, RecommendedItem } from '@/types';
+import './UserSettings.less';
 // @ts-ignore
 import ImgCrop from 'antd-img-crop';
 
@@ -321,250 +322,250 @@ const UserSettings: React.FC = () => {
 
   return (
     <div style={{ padding: '24px 48px' }}>
-      <Card bordered styles={{ body: { padding: 0 } }}>
+      <Card styles={{ body: { padding: 0 } }}>
         <Tabs
+          className="user-settings-tabs"
           activeKey={activeTab}
           onChange={setActiveTab}
-          tabBarStyle={{ margin: 0 }}
+          tabBarStyle={{ margin: 0, borderBottom: 'none' }}
           renderTabBar={(props, DefaultTabBar) => (
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                minHeight: 56,
                 padding: '0 24px',
-                borderBottom: '1px solid #f0f0f0',
+                borderBottom: '1px solid #f0f0f0'
               }}
             >
               <DefaultTabBar {...props} />
             </div>
           )}
         >
-        <TabPane tab="基础信息配置" key="basic">
-          <div style={{ padding: 24 }}>
-          <Card styles={{ body: { padding: 0} }}>
-            {userInfo && (
-              <Form layout="vertical">
-                <Form.Item label="姓名" required>
-                  <Input
-                    value={userInfo.name}
-                    onChange={(e) => handleUserChange('name', e.target.value)}
-                    placeholder="请输入姓名"
-                    maxLength={10}
-                  />
-                </Form.Item>
-                <Form.Item label="年龄" required>
-                  <InputNumber
-                    value={userInfo.age}
-                    onChange={(value) => handleUserChange('age', String(value ?? 0))}
-                    placeholder="请输入年龄"
-                    style={{ width: '100%' }}
-                    min={0}
-                    max={120}
-                  />
-                </Form.Item>
-                <Form.Item label="爱好" required>
-                  <Input
-                    value={userInfo.hobbies.join(', ')}
-                    onChange={(e) => handleUserChange('hobbies', e.target.value)}
-                    placeholder="请输入爱好，用逗号分隔"
-                  />
-                </Form.Item>
-                <Form.Item label="职业" required>
-                  <Input
-                    value={userInfo.profession}
-                    onChange={(e) => handleUserChange('profession', e.target.value)}
-                    placeholder="请输入职业或角色"
-                    maxLength={10}
-                  />
-                </Form.Item>
-                <Form.Item label="个人介绍" required>
-                  <Input.TextArea
-                    value={userInfo.introduction}
-                    onChange={(e) => handleUserChange('introduction', e.target.value)}
-                    placeholder="请输入个人介绍"
-                    rows={4}
-                    maxLength={300}
-                  />
-                </Form.Item>
-                <Form.Item label="头像" required>
-                  <div style={{ display: 'flex', gap: '16px' }}>
+          <TabPane tab="基础信息配置" key="basic">
+            <div style={{ padding: 24 }}>
+            <Card styles={{ body: { padding: 0} }}>
+              {userInfo && (
+                <Form layout="vertical">
+                  <Form.Item label="姓名" required>
                     <Input
-                      value={userInfo.avatar}
-                      onChange={(e) => handleUserChange('avatar', e.target.value)}
-                      placeholder="请输入头像图片 URL"
-                      style={{ flex: 1 }}
+                      value={userInfo.name}
+                      onChange={(e) => handleUserChange('name', e.target.value)}
+                      placeholder="请输入姓名"
+                      maxLength={10}
                     />
-                    <Upload
-                      name="file"
-                      showUploadList={false}
-                      beforeUpload={(file) => handleFileUpload(file, 'avatar')}
-                      disabled={uploading}
-                    >
-                      <Button icon={<UploadOutlined />} loading={uploading}>
-                        上传
-                      </Button>
-                    </Upload>
-                  </div>
-                </Form.Item>
-                <Form.Item label="作品集" required>
-                  <div style={{ display: 'flex', gap: '16px' }}>
+                  </Form.Item>
+                  <Form.Item label="年龄" required>
+                    <InputNumber
+                      value={userInfo.age}
+                      onChange={(value) => handleUserChange('age', String(value ?? 0))}
+                      placeholder="请输入年龄"
+                      style={{ width: '100%' }}
+                      min={0}
+                      max={120}
+                    />
+                  </Form.Item>
+                  <Form.Item label="爱好" required>
                     <Input
-                      value={userInfo.portfolio}
-                      onChange={(e) => handleUserChange('portfolio', e.target.value)}
-                      placeholder="请输入作品集 PDF URL"
-                      style={{ flex: 1 }}
+                      value={userInfo.hobbies.join(', ')}
+                      onChange={(e) => handleUserChange('hobbies', e.target.value)}
+                      placeholder="请输入爱好，用逗号分隔"
                     />
-                    <Upload
-                      name="file"
-                      showUploadList={false}
-                      beforeUpload={(file) => {
-                        if (file.type !== 'application/pdf') {
-                          message.error('仅支持 PDF 格式');
-                          return false;
-                        }
-                        if (file.size > 200 * 1024 * 1024) {
-                          message.error('文件大小不能超过 200MB');
-                          return false;
-                        }
-                        return handleFileUpload(file, 'portfolio');
-                      }}
-                      disabled={uploading}
-                    >
-                      <Button icon={<UploadOutlined />} loading={uploading}>
-                        上传 PDF
-                      </Button>
-                    </Upload>
-                  </div>
-                </Form.Item>
-                <Form.Item label="电话" required>
-                  <Input
-                    value={userInfo.phone}
-                    onChange={(e) => handleUserChange('phone', e.target.value)}
-                    placeholder="请输入手机号"
-                    maxLength={11}
-                    pattern="[0-9]{11}"
-                  />
-                </Form.Item>
-                <Form.Item label="微信二维码" required>
-                  <div style={{ display: 'flex', gap: '16px' }}>
+                  </Form.Item>
+                  <Form.Item label="职业" required>
                     <Input
-                      value={userInfo.wechatQRCode}
-                      onChange={(e) => handleUserChange('wechatQRCode', e.target.value)}
-                      placeholder="请输入微信二维码图片 URL"
-                      style={{ flex: 1 }}
+                      value={userInfo.profession}
+                      onChange={(e) => handleUserChange('profession', e.target.value)}
+                      placeholder="请输入职业或角色"
+                      maxLength={10}
                     />
-                    <Upload
-                      name="file"
-                      showUploadList={false}
-                      beforeUpload={(file) => {
-                        if (file.size > 5 * 1024 * 1024) {
-                          message.error('文件大小不能超过 5MB');
-                          return false;
-                        }
-                        return handleFileUpload(file, 'wechatQRCode');
-                      }}
-                      disabled={uploading}
-                    >
-                      <Button icon={<UploadOutlined />} loading={uploading}>
-                        上传
-                      </Button>
-                    </Upload>
-                  </div>
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" onClick={handleSaveUser} loading={saving}>
-                    保存基础信息
-                  </Button>
-                </Form.Item>
-              </Form>
-            )}
-          </Card>
-          </div>
-        </TabPane>
-        <TabPane tab="推荐内容" key="recommendations">
-          <div style={{ padding: 24 }}>
-            <div
-              style={{
-                marginBottom: 16,
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                gap: 8,
-              }}
-            >
-              <Button type="primary" onClick={() => setModalVisible(true)}>
-                新增内容
-              </Button>
-              <Button onClick={handleSaveRecommendations} loading={saving}>
-                保存配置
-              </Button>
+                  </Form.Item>
+                  <Form.Item label="个人介绍" required>
+                    <Input.TextArea
+                      value={userInfo.introduction}
+                      onChange={(e) => handleUserChange('introduction', e.target.value)}
+                      placeholder="请输入个人介绍"
+                      rows={4}
+                      maxLength={300}
+                    />
+                  </Form.Item>
+                  <Form.Item label="头像" required>
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                      <Input
+                        value={userInfo.avatar}
+                        onChange={(e) => handleUserChange('avatar', e.target.value)}
+                        placeholder="请输入头像图片 URL"
+                        style={{ flex: 1 }}
+                      />
+                      <Upload
+                        name="file"
+                        showUploadList={false}
+                        beforeUpload={(file) => handleFileUpload(file, 'avatar')}
+                        disabled={uploading}
+                      >
+                        <Button icon={<UploadOutlined />} loading={uploading}>
+                          上传
+                        </Button>
+                      </Upload>
+                    </div>
+                  </Form.Item>
+                  <Form.Item label="作品集" required>
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                      <Input
+                        value={userInfo.portfolio}
+                        onChange={(e) => handleUserChange('portfolio', e.target.value)}
+                        placeholder="请输入作品集 PDF URL"
+                        style={{ flex: 1 }}
+                      />
+                      <Upload
+                        name="file"
+                        showUploadList={false}
+                        beforeUpload={(file) => {
+                          if (file.type !== 'application/pdf') {
+                            message.error('仅支持 PDF 格式');
+                            return false;
+                          }
+                          if (file.size > 200 * 1024 * 1024) {
+                            message.error('文件大小不能超过 200MB');
+                            return false;
+                          }
+                          return handleFileUpload(file, 'portfolio');
+                        }}
+                        disabled={uploading}
+                      >
+                        <Button icon={<UploadOutlined />} loading={uploading}>
+                          上传 PDF
+                        </Button>
+                      </Upload>
+                    </div>
+                  </Form.Item>
+                  <Form.Item label="电话" required>
+                    <Input
+                      value={userInfo.phone}
+                      onChange={(e) => handleUserChange('phone', e.target.value)}
+                      placeholder="请输入手机号"
+                      maxLength={11}
+                      pattern="[0-9]{11}"
+                    />
+                  </Form.Item>
+                  <Form.Item label="微信二维码" required>
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                      <Input
+                        value={userInfo.wechatQRCode}
+                        onChange={(e) => handleUserChange('wechatQRCode', e.target.value)}
+                        placeholder="请输入微信二维码图片 URL"
+                        style={{ flex: 1 }}
+                      />
+                      <Upload
+                        name="file"
+                        showUploadList={false}
+                        beforeUpload={(file) => {
+                          if (file.size > 5 * 1024 * 1024) {
+                            message.error('文件大小不能超过 5MB');
+                            return false;
+                          }
+                          return handleFileUpload(file, 'wechatQRCode');
+                        }}
+                        disabled={uploading}
+                      >
+                        <Button icon={<UploadOutlined />} loading={uploading}>
+                          上传
+                        </Button>
+                      </Upload>
+                    </div>
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="primary" onClick={handleSaveUser} loading={saving}>
+                      保存基础信息
+                    </Button>
+                  </Form.Item>
+                </Form>
+              )}
+            </Card>
             </div>
+          </TabPane>
+          <TabPane tab="推荐内容" key="recommendations">
+            <div style={{ padding: 24 }}>
+              <div
+                style={{
+                  marginBottom: 16,
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <Button type="primary" onClick={() => setModalVisible(true)}>
+                  新增内容
+                </Button>
+                <Button onClick={handleSaveRecommendations} loading={saving}>
+                  保存配置
+                </Button>
+              </div>
 
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #e8e8e8' }}>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>内容</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>类型</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>路由</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Default图片</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Hover图片</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>启用</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recommendedItems.map(item => (
-                    <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                      <td style={{ padding: '12px' }}>{item.title}</td>
-                      <td style={{ padding: '12px' }}>{item.type === 'project' ? '项目' : item.type === 'article' ? '文章' : '插件'}</td>
-                      <td style={{ padding: '12px' }}>{item.id}</td>
-                      <td style={{ padding: '12px' }}>{item.defaultImage ? '✓' : '✗'}</td>
-                      <td style={{ padding: '12px' }}>{item.hoverImage ? '✓' : '✗'}</td>
-                      <td style={{ padding: '12px' }}>
-                        <input 
-                          type="checkbox" 
-                          checked={item.enabled} 
-                          onChange={(e) => {
-                            const updatedItems = recommendedItems.map(i => 
-                              i.id === item.id ? { ...i, enabled: e.target.checked } : i
-                            );
-                            setRecommendedItems(updatedItems);
-                          }}
-                        />
-                      </td>
-                      <td style={{ padding: '12px' }}>
-                        <Button 
-                          type="link" 
-                          onClick={() => {
-                            setEditingItem(item);
-                            editForm.setFieldsValue({
-                              itemId: `${item.type}-${item.id}`,
-                              defaultImage: item.defaultImage,
-                              hoverImage: item.hoverImage
-                            });
-                            setModalVisible(true);
-                          }}
-                        >
-                          编辑
-                        </Button>
-                        <Button 
-                          type="link" 
-                          danger
-                          onClick={() => handleRemoveFromRecommendations(item.id)}
-                        >
-                          删除
-                        </Button>
-                      </td>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #e8e8e8' }}>
+                      <th style={{ padding: '12px', textAlign: 'left' }}>内容</th>
+                      <th style={{ padding: '12px', textAlign: 'left' }}>类型</th>
+                      <th style={{ padding: '12px', textAlign: 'left' }}>路由</th>
+                      <th style={{ padding: '12px', textAlign: 'left' }}>Default图片</th>
+                      <th style={{ padding: '12px', textAlign: 'left' }}>Hover图片</th>
+                      <th style={{ padding: '12px', textAlign: 'left' }}>启用</th>
+                      <th style={{ padding: '12px', textAlign: 'left' }}>操作</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {recommendedItems.map(item => (
+                      <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '12px' }}>{item.title}</td>
+                        <td style={{ padding: '12px' }}>{item.type === 'project' ? '项目' : item.type === 'article' ? '文章' : '插件'}</td>
+                        <td style={{ padding: '12px' }}>{item.id}</td>
+                        <td style={{ padding: '12px' }}>{item.defaultImage ? '✓' : '✗'}</td>
+                        <td style={{ padding: '12px' }}>{item.hoverImage ? '✓' : '✗'}</td>
+                        <td style={{ padding: '12px' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={item.enabled} 
+                            onChange={(e) => {
+                              const updatedItems = recommendedItems.map(i => 
+                                i.id === item.id ? { ...i, enabled: e.target.checked } : i
+                              );
+                              setRecommendedItems(updatedItems);
+                            }}
+                          />
+                        </td>
+                        <td style={{ padding: '12px' }}>
+                          <Button 
+                            type="link" 
+                            onClick={() => {
+                              setEditingItem(item);
+                              editForm.setFieldsValue({
+                                itemId: `${item.type}-${item.id}`,
+                                defaultImage: item.defaultImage,
+                                hoverImage: item.hoverImage
+                              });
+                              setModalVisible(true);
+                            }}
+                          >
+                            编辑
+                          </Button>
+                          <Button 
+                            type="link" 
+                            danger
+                            onClick={() => handleRemoveFromRecommendations(item.id)}
+                          >
+                            删除
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        </TabPane>
-      </Tabs>
+          </TabPane>
+        </Tabs>
       </Card>
 
       {/* 编辑推荐项目模态框 */}
