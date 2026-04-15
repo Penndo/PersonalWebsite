@@ -73,34 +73,68 @@
   backdrop-filter: blur(4px);
 }
 
+// 与 .intro-card max-width 一致，用于两侧占位：(100% - 卡片上限) / 2，保证中间卡片相对整行水平居中
+@intro-floating-card-max: 480px;
+
 .intro-section {
   width: 100%;
   height: 100%;
   max-height: 100vh;
   max-width: 100vw;
   display: flex;
-  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+  /* 中间卡片固定 480px + 两侧至少 160px 时，窄于约 800px 会超出，横向滚动优于压缩卡片 */
+  // overflow-x: auto;
+  // overflow-y: visible;
+}
+
+.floating-icons-left,
+.floating-icons-right {
+  /* 至少容纳 160×160 图标，避免列窄于图标时 flex 子项被压扁（绝对定位子节点不参与 min-width 计算） */
+  flex: 0 0 max(160px, calc(max(0px, (100% - @intro-floating-card-max) / 2)));
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .floating-icons-left {
+  width: calc(100vh-480px)/2;
+  display: flex;
+  flex-direction: column;
   align-items: flex-end;
   transform: translateY(-20px);
 }
 
 .floating-icons-right {
+  width: calc(100vh-480px)/2;
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
   transform: translateY(10px);
 }
 
+// .floating-icon-shell {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: fit-content;
+//   min-width: 160px;
+//   min-height: 160px;
+//   flex-shrink: 0;
+// }
+
 .intro-card {
   display: flex;
   position: relative;
-  width: 100%;
+  flex: 0 0 @intro-floating-card-max;
+  width: @intro-floating-card-max;
+  max-width: @intro-floating-card-max;
   height: 100%;
-  max-width: 480px;
   justify-content: center;
   padding: 0px 24px 24px 24px;
   transition: transform 0.3s ease 0s;
+  box-sizing: border-box;
 
   &:hover {
 
@@ -209,8 +243,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   width: 160px;
   height: 160px;
+  min-width: 160px;
+  min-height: 160px;
+  flex-shrink: 0;
   cursor: pointer;
   overflow: visible;
   transition: transform 0.3s ease;
@@ -222,8 +260,11 @@
   .icon-default,
   .icon-hover {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    inset: 0;
+    width: 160px;
+    height: 160px;
+    max-width: none;
+    max-height: none;
     object-fit: contain;
     transition: all 0.3s ease;
   }
@@ -271,44 +312,61 @@
   }
 }
 
-.icon-hooinn {
-  border-radius: 109px;
-  width: 140px;
-  height: 140px;
+/* 漂浮与错位由列内序号决定，不依赖标题拼出的 .icon-xxx（自定义标题无法匹配旧选择器） */
+.floating-icon--pos-left-0 {
+  border-radius: 80px;
+  width: 160px;
+  height: 160px;
+  min-width: 160px;
+  min-height: 160px;
   position: relative;
   left: -200px;
   top: -40px;
-  // margin: -15px 0 0 -10px;
-  animation: float1 4s ease-in-out infinite;
 }
 
-.icon-kaiyun {
-  width: 140px;
-  height: 140px;
+.floating-icon--pos-left-1 {
+  width: 160px;
+  height: 160px;
+  min-width: 160px;
+  min-height: 160px;
   position: relative;
   left: -80px;
   top: 40px;
-  // margin: 20px 0 0 5px;
-  animation: float2 5s ease-in-out infinite 0.5s;
 }
 
-.icon-pub {
-  width: 140px;
-  height: 140px;
+.floating-icon--pos-right-0 {
+  width: 160px;
+  height: 160px;
+  min-width: 160px;
+  min-height: 160px;
   position: relative;
   left: 160px;
-  top: 0px;
-  // margin: -5px 0 0 15px;
-  animation: float3 4.5s ease-in-out infinite 1s;
+  top: 0;
 }
 
-.icon-ezc {
-  width: 140px;
-  height: 140px;
+.floating-icon--pos-right-1 {
+  width: 160px;
+  height: 160px;
+  min-width: 160px;
+  min-height: 160px;
   position: relative;
   left: 40px;
   top: 20px;
-  // margin: 15px 0 0 -5px;
+}
+
+.floating-icon--drift-1 {
+  animation: float1 4s ease-in-out infinite;
+}
+
+.floating-icon--drift-2 {
+  animation: float2 5s ease-in-out infinite 0.5s;
+}
+
+.floating-icon--drift-3 {
+  animation: float3 4.5s ease-in-out infinite 1s;
+}
+
+.floating-icon--drift-4 {
   animation: float4 5.5s ease-in-out infinite 1.5s;
 }
 
@@ -409,5 +467,15 @@
   .floating-icons-left,
   .floating-icons-right {
     display: none;
+  }
+
+  .intro-section {
+    overflow-x: visible;
+  }
+
+  .intro-card {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: none;
   }
 }

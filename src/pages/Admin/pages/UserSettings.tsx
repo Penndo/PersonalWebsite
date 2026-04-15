@@ -343,9 +343,11 @@ const UserSettings: React.FC = () => {
         >
           <TabPane tab="基础信息配置" key="basic">
             <div style={{ padding: 24 }}>
-            <Card styles={{ body: { padding: 0} }}>
+            <Card styles={{ body: { padding: 0}}}
+              style={{ border: 'none' }}
+            >
               {userInfo && (
-                <Form layout="vertical">
+                <Form layout="vertical" className="user-settings-form">
                   <Form.Item label="姓名" required>
                     <Input
                       value={userInfo.name}

@@ -80,8 +80,14 @@ const FloatingRecommendedIcon: React.FC<{
   const hasDefaultVisible = hasDefaultConfigured && isNonEmptyImageUrl(defaultSrc);
   const hasHoverVisible = hasHoverConfigured && isNonEmptyImageUrl(hoverSrc);
 
+  const slot = index % 2;
+  const driftClass = `floating-icon--drift-${side === 'left' ? slot + 1 : slot + 3}`;
+  const posClass = `floating-icon--pos-${side}-${slot}`;
+
   const iconClass = [
     'floating-icon',
+    driftClass,
+    posClass,
     `icon-${item.title.toLowerCase()}`,
     !hasHoverVisible ? 'floating-icon--no-hover-image' : '',
     !hasDefaultVisible ? 'floating-icon--no-default-image' : '',
@@ -89,32 +95,31 @@ const FloatingRecommendedIcon: React.FC<{
     .filter(Boolean)
     .join(' ');
 
-  const motionProps =
+  const entranceTransition =
     side === 'left'
-      ? {
-          initial: { opacity: 0, x: -20 },
-          animate: { opacity: 1, x: 0 },
-          transition: { duration: 0.5, delay: 0.5 + index * 0.1 },
-        }
-      : {
-          initial: { opacity: 0, x: 20 },
-          animate: { opacity: 1, x: 0 },
-          transition: { duration: 0.5, delay: 0.7 + index * 0.1 },
-        };
+      ? { duration: 0.5, delay: 0.5 + index * 0.1 }
+      : { duration: 0.5, delay: 0.7 + index * 0.1 };
 
   return (
-    <motion.div className={iconClass} {...motionProps} onClick={onItemClick}>
-      {hasDefaultVisible && (
-        <img src={defaultSrc} alt={item.title} className="icon-default" onError={onDefaultError} />
-      )}
-      {hasHoverVisible && (
-        <img
-          src={hoverSrc}
-          alt={`${item.title} Hover`}
-          className="icon-hover"
-          onError={onHoverError}
-        />
-      )}
+    <motion.div
+      className="floating-icon-shell"
+      initial={{ opacity: 0, x: side === 'left' ? -20 : 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={entranceTransition}
+    >
+      <div className={iconClass} onClick={onItemClick}>
+        {hasDefaultVisible && (
+          <img src={defaultSrc} alt={item.title} className="icon-default" onError={onDefaultError} />
+        )}
+        {hasHoverVisible && (
+          <img
+            src={hoverSrc}
+            alt={`${item.title} Hover`}
+            className="icon-hover"
+            onError={onHoverError}
+          />
+        )}
+      </div>
     </motion.div>
   );
 };
@@ -125,10 +130,10 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], on
   // 按顺序排序推荐项目
   const sortedItems = [...recommendedItems].sort((a, b) => a.order - b.order);
   
-  // 分为左右两列
+  // 分为左右两列（偶数位左、奇数位右）
   const leftItems = sortedItems.filter((_, index) => index % 2 === 0);
   const rightItems = sortedItems.filter((_, index) => index % 2 === 1);
-  
+
   // 处理推荐项目点击
   const handleRecommendedItemClick = (item: RecommendedItem) => {
     switch (item.type) {
@@ -191,7 +196,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], on
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <div className="floating-icons-left">
+          <div className="floating-icons-left" aria-hidden={leftItems.length === 0}>
             {leftItems.map((item, index) => (
               <FloatingRecommendedIcon
                 key={item.id}
@@ -212,7 +217,7 @@ const Homepage: React.FC<HomepageProps> = ({ userInfo, recommendedItems = [], on
             </div>
           </div>
 
-          <div className="floating-icons-right">
+          <div className="floating-icons-right" aria-hidden={rightItems.length === 0}>
             {rightItems.map((item, index) => (
               <FloatingRecommendedIcon
                 key={item.id}
