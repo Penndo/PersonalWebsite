@@ -19,7 +19,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6vh;
-  padding: 24spx 24px;
+  padding: 24px 24px;
   position: relative;
   z-index: 1;
 }
@@ -99,7 +99,7 @@
 }
 
 .floating-icons-left {
-  width: calc(100vh-480px)/2;
+  min-width: calc((100vh - 480px) / 2);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -107,7 +107,7 @@
 }
 
 .floating-icons-right {
-  width: calc(100vh-480px)/2;
+  min-width: calc((100vh - 480px) / 2);  // ✅ 正确
   display: flex;
   flex-direction: column;
   align-items: flex-start;
