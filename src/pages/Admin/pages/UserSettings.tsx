@@ -1,95 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Modal, Select, UploadFile } from 'antd';
+import { useEffect, useState, useRef } from 'react';
+import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Modal, Select, Popconfirm} from 'antd';
 const { Option, OptGroup } = Select;
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 import { userApi, projectApi, articleApi, pluginApi, uploadApi, recommendationApi } from '@/services/api';
 import type { UserInfo, Project, Article, Plugin, RecommendedItem } from '@/types';
 import './UserSettings.less';
-// @ts-ignore
-import ImgCrop from 'antd-img-crop';
+import DeferredImageUpload, { clearAllDeferredBlobs } from '@/components/DeferredImageUpload/DeferredImageUpload';
+import { collectUploadPathsFromRecommendations, collectUploadPathsFromUser } from '@/utils/uploads';
 
 const { TabPane } = Tabs;
-
-/** 用表单字段存图片 URL，通过 value/onChange 与 Form 绑定，保证上传后与再次打开时的预览、回显正常 */
-type RecommendationImageUploadProps = {
-  value?: string;
-  onChange?: (url: string) => void;
-  crop?: boolean;
-};
-
-const RecommendationImageUpload: React.FC<RecommendationImageUploadProps> = ({
-  value,
-  onChange,
-  crop,
-}) => {
-  const fileList: UploadFile[] = value
-    ? [
-        {
-          uid: '-1',
-          name: value.split('/').pop() || 'image.png',
-          status: 'done',
-          url: value,
-          thumbUrl: value,
-        },
-      ]
-    : [];
-
-  const upload = (
-    <Upload
-      name="file"
-      listType="picture-card"
-      fileList={fileList}
-      maxCount={1}
-      accept="image/*"
-      onChange={({ fileList: next }) => {
-        if (next.length === 0) {
-          onChange?.('');
-        }
-      }}
-      beforeUpload={(file) => {
-        if (file.size > 5 * 1024 * 1024) {
-          message.error('文件大小不能超过 5MB');
-          return false;
-        }
-        uploadApi
-          .uploadImage(file)
-          .then((response) => {
-            onChange?.(response.data.url);
-            message.success('上传成功');
-          })
-          .catch((error) => {
-            console.error('Upload failed:', error);
-            message.error('上传失败，请重试');
-          });
-        return false;
-      }}
-      onRemove={() => {
-        onChange?.('');
-      }}
-    >
-      {fileList.length === 0 && (
-        <div
-          style={{
-            width: '100px',
-            height: '100px',
-            border: '1px dashed #d9d9d9',
-            borderRadius: '4px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <PlusOutlined />
-          <div style={{ marginTop: 8 }}>Upload</div>
-        </div>
-      )}
-    </Upload>
-  );
-
-  return crop ? <ImgCrop>{upload}</ImgCrop> : upload;
-};
 
 const UserSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('basic');
@@ -104,9 +23,24 @@ const UserSettings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  /** blob 预览 URL → File，仅在「保存配置」时调用 uploadApi */
+  const recommendationPendingFilesRef = useRef<Map<string, File>>(new Map());
+  /** 头像 / 微信二维码：仅在「保存基础信息」时上传 */
+  const userProfilePendingFilesRef = useRef<Map<string, File>>(new Map());
+  /** 上次已成功持久化到服务端的用户信息，用于对比并删除被替换的 /uploads/ 文件 */
+  const lastPersistedUserRef = useRef<UserInfo | null>(null);
+  /** 上次成功从服务端拉取或保存后的推荐列表；与本次保存结果对比才能发现「已删除行」上的图片等孤儿资源 */
+  const lastPersistedRecommendationsRef = useRef<RecommendedItem[]>([]);
 
   useEffect(() => {
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      clearAllDeferredBlobs(recommendationPendingFilesRef);
+      clearAllDeferredBlobs(userProfilePendingFilesRef);
+    };
   }, []);
 
   const fetchData = async () => {
@@ -123,12 +57,14 @@ const UserSettings: React.FC = () => {
       
       // 处理用户信息
       if (userRes.status === 'fulfilled') {
-        setUserInfo({
+        const loaded: UserInfo = {
           ...userRes.value.data,
           phone: userRes.value.data.phone || '',
           portfolio: userRes.value.data.portfolio || '',
-          wechatQRCode: userRes.value.data.wechatQRCode || ''
-        });
+          wechatQRCode: userRes.value.data.wechatQRCode || '',
+        };
+        setUserInfo(loaded);
+        lastPersistedUserRef.current = loaded;
       } else {
         console.error('Failed to fetch user info:', userRes.reason);
         message.warning('获取用户信息失败');
@@ -160,18 +96,24 @@ const UserSettings: React.FC = () => {
       
       // 处理推荐项目数据
       if (recommendationsRes.status === 'fulfilled') {
-        setRecommendedItems(recommendationsRes.value.data);
+        const recData = recommendationsRes.value.data;
+        setRecommendedItems(recData);
+        lastPersistedRecommendationsRef.current = JSON.parse(
+          JSON.stringify(recData),
+        ) as RecommendedItem[];
       } else {
         console.error('Failed to fetch recommendations:', recommendationsRes.reason);
         message.warning('获取推荐项目数据失败');
         // 出错时使用空数组
         setRecommendedItems([]);
+        lastPersistedRecommendationsRef.current = [];
       }
     } catch (err) {
       console.error(err);
       message.error('获取数据失败');
       // 出错时使用空数组
       setRecommendedItems([]);
+      lastPersistedRecommendationsRef.current = [];
     } finally {
       setLoading(false);
     }
@@ -188,6 +130,17 @@ const UserSettings: React.FC = () => {
     }
 
     setUserInfo({ ...userInfo, [field]: newValue } as UserInfo);
+  };
+
+  /** 手动改 URL 时若覆盖本地 blob 预览，则释放 blob，避免泄漏 */
+  const handleUserImageFieldInput = (field: 'avatar' | 'wechatQRCode', next: string) => {
+    if (!userInfo) return;
+    const prev = userInfo[field];
+    if (typeof prev === 'string' && prev.startsWith('blob:') && prev !== next) {
+      userProfilePendingFilesRef.current.delete(prev);
+      URL.revokeObjectURL(prev);
+    }
+    handleUserChange(field, next);
   };
 
   const handleFileUpload = async (file: File, field: string) => {
@@ -210,9 +163,36 @@ const UserSettings: React.FC = () => {
   const handleSaveUser = async () => {
     if (!userInfo) return;
     setSaving(true);
+    const prevPersisted = lastPersistedUserRef.current;
     try {
-      const res = await userApi.updateUserInfo(userInfo);
+      const payload: UserInfo = JSON.parse(JSON.stringify(userInfo)) as UserInfo;
+      for (const field of ['avatar', 'wechatQRCode'] as const) {
+        const u = payload[field];
+        if (typeof u !== 'string' || !u.startsWith('blob:')) continue;
+        const file = userProfilePendingFilesRef.current.get(u);
+        if (!file) {
+          message.error('部分图片仅在本地预览，请重新选择后再保存');
+          return;
+        }
+        const { data } = await uploadApi.uploadImage(file);
+        userProfilePendingFilesRef.current.delete(u);
+        URL.revokeObjectURL(u);
+        payload[field] = data.url;
+      }
+
+      const res = await userApi.updateUserInfo(payload);
+
+      const beforePaths = collectUploadPathsFromUser(prevPersisted);
+      const afterPaths = collectUploadPathsFromUser(res.data);
+      const refPathsFromRecommendations = collectUploadPathsFromRecommendations(recommendedItems);
+      for (const p of beforePaths) {
+        if (afterPaths.has(p)) continue;
+        if (refPathsFromRecommendations.has(p)) continue;
+        await uploadApi.deleteUpload(p).catch(() => {});
+      }
+
       setUserInfo(res.data);
+      lastPersistedUserRef.current = res.data;
       message.success('用户信息已保存');
     } catch (err) {
       console.error(err);
@@ -224,7 +204,44 @@ const UserSettings: React.FC = () => {
 
 
   const handleRemoveFromRecommendations = (id: string) => {
-    setRecommendedItems(recommendedItems.filter(item => item.id !== id));
+    const row = recommendedItems.find((item) => item.id === id);
+    if (row) {
+      if (row.defaultImage?.startsWith('blob:')) {
+        recommendationPendingFilesRef.current.delete(row.defaultImage);
+        URL.revokeObjectURL(row.defaultImage);
+      }
+      if (row.hoverImage?.startsWith('blob:')) {
+        recommendationPendingFilesRef.current.delete(row.hoverImage);
+        URL.revokeObjectURL(row.hoverImage);
+      }
+    }
+    setRecommendedItems(recommendedItems.filter((item) => item.id !== id));
+  };
+
+  /** 弹窗内已写入 recommendedItems：只关弹窗。勿 revoke 表单里的 blob，否则 Map 被清空后「保存配置」无法上传 */
+  const hideRecommendationModal = () => {
+    setModalVisible(false);
+    setEditingItem(null);
+    editForm.resetFields();
+  };
+
+  /** 取消 / 点遮罩关闭：只 revoke 仍未写入 recommendedItems 的 blob（避免把列表里正在用的预览 revoke 掉，第二次编辑会 ERR_FILE_NOT_FOUND） */
+  const discardRecommendationModal = () => {
+    const { defaultImage, hoverImage } = editForm.getFieldsValue(['defaultImage', 'hoverImage']);
+
+    const revokeIfOrphanBlob = (url: unknown) => {
+      if (typeof url !== 'string' || !url.startsWith('blob:')) return;
+      const stillReferenced = recommendedItems.some(
+        (it) => it.defaultImage === url || it.hoverImage === url
+      );
+      if (stillReferenced) return;
+      recommendationPendingFilesRef.current.delete(url);
+      URL.revokeObjectURL(url);
+    };
+
+    revokeIfOrphanBlob(defaultImage);
+    revokeIfOrphanBlob(hoverImage);
+    hideRecommendationModal();
   };
 
   const handleSaveRecommendationEdit = async (values: any) => {
@@ -237,9 +254,7 @@ const UserSettings: React.FC = () => {
       );
       
       setRecommendedItems(updatedItems);
-      setModalVisible(false);
-      setEditingItem(null);
-      editForm.resetFields();
+      hideRecommendationModal();
       message.success('编辑成功');
     } else {
       // 添加新项目
@@ -292,8 +307,7 @@ const UserSettings: React.FC = () => {
       }
       
       setRecommendedItems([...recommendedItems, newRecommendedItem]);
-      setModalVisible(false);
-      editForm.resetFields();
+      hideRecommendationModal();
       message.success('添加成功');
     }
   };
@@ -301,8 +315,40 @@ const UserSettings: React.FC = () => {
   const handleSaveRecommendations = async () => {
     setSaving(true);
     try {
-      // 调用API保存推荐项目配置
-      await recommendationApi.saveRecommendations(recommendedItems);
+      const nextItems: RecommendedItem[] = JSON.parse(JSON.stringify(recommendedItems)) as RecommendedItem[];
+      const blobUrlsToClear: string[] = [];
+
+      for (const item of nextItems) {
+        for (const key of ['defaultImage', 'hoverImage'] as const) {
+          const u = item[key];
+          if (typeof u !== 'string' || !u.startsWith('blob:')) continue;
+          const file = recommendationPendingFilesRef.current.get(u);
+          if (!file) {
+            message.error('部分图片仅在本地预览，请重新选择后再保存');
+            return;
+          }
+          const response = await uploadApi.uploadImage(file);
+          item[key] = response.data.url;
+          blobUrlsToClear.push(u);
+        }
+      }
+
+      const res = await recommendationApi.saveRecommendations(nextItems);
+      for (const blob of blobUrlsToClear) {
+        recommendationPendingFilesRef.current.delete(blob);
+        URL.revokeObjectURL(blob);
+      }
+      // 与「上次服务端状态」对比，才能覆盖：列表里已删掉、但尚未保存的行（其 /uploads/ 图否则不会被清理）
+      const beforeRec = collectUploadPathsFromRecommendations(lastPersistedRecommendationsRef.current);
+      const afterRec = collectUploadPathsFromRecommendations(res.data);
+      const refPathsFromUser = collectUploadPathsFromUser(lastPersistedUserRef.current);
+      for (const u of beforeRec) {
+        if (afterRec.has(u)) continue;
+        if (refPathsFromUser.has(u)) continue;
+        await uploadApi.deleteUpload(u).catch(() => {});
+      }
+      lastPersistedRecommendationsRef.current = JSON.parse(JSON.stringify(res.data)) as RecommendedItem[];
+      setRecommendedItems(res.data);
       message.success('推荐项目配置已保存');
     } catch (err) {
       console.error(err);
@@ -391,24 +437,18 @@ const UserSettings: React.FC = () => {
                     />
                   </Form.Item>
                   <Form.Item label="头像" required>
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                      <Input
-                        value={userInfo.avatar}
-                        onChange={(e) => handleUserChange('avatar', e.target.value)}
-                        placeholder="请输入头像图片 URL"
-                        style={{ flex: 1 }}
-                      />
-                      <Upload
-                        name="file"
-                        showUploadList={false}
-                        beforeUpload={(file) => handleFileUpload(file, 'avatar')}
-                        disabled={uploading}
-                      >
-                        <Button icon={<UploadOutlined />} loading={uploading}>
-                          上传
-                        </Button>
-                      </Upload>
-                    </div>
+                    <DeferredImageUpload
+                      value={userInfo.avatar}
+                      onChange={(url) => handleUserChange('avatar', url)}
+                      pendingFilesRef={userProfilePendingFilesRef}
+                      commitHint="已选择，点击「保存基础信息」后上传服务器"
+                    />
+                    <Input
+                      style={{ marginTop: 8 }}
+                      value={userInfo.avatar}
+                      onChange={(e) => handleUserImageFieldInput('avatar', e.target.value)}
+                      placeholder="或直接填写图片 URL"
+                    />
                   </Form.Item>
                   <Form.Item label="作品集" required>
                     <div style={{ display: 'flex', gap: '16px' }}>
@@ -450,30 +490,18 @@ const UserSettings: React.FC = () => {
                     />
                   </Form.Item>
                   <Form.Item label="微信二维码" required>
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                      <Input
-                        value={userInfo.wechatQRCode}
-                        onChange={(e) => handleUserChange('wechatQRCode', e.target.value)}
-                        placeholder="请输入微信二维码图片 URL"
-                        style={{ flex: 1 }}
-                      />
-                      <Upload
-                        name="file"
-                        showUploadList={false}
-                        beforeUpload={(file) => {
-                          if (file.size > 5 * 1024 * 1024) {
-                            message.error('文件大小不能超过 5MB');
-                            return false;
-                          }
-                          return handleFileUpload(file, 'wechatQRCode');
-                        }}
-                        disabled={uploading}
-                      >
-                        <Button icon={<UploadOutlined />} loading={uploading}>
-                          上传
-                        </Button>
-                      </Upload>
-                    </div>
+                    <DeferredImageUpload
+                      value={userInfo.wechatQRCode || ''}
+                      onChange={(url) => handleUserChange('wechatQRCode', url)}
+                      pendingFilesRef={userProfilePendingFilesRef}
+                      commitHint="已选择，点击「保存基础信息」后上传服务器"
+                    />
+                    <Input
+                      style={{ marginTop: 8 }}
+                      value={userInfo.wechatQRCode || ''}
+                      onChange={(e) => handleUserImageFieldInput('wechatQRCode', e.target.value)}
+                      placeholder="或直接填写图片 URL"
+                    />
                   </Form.Item>
                   <Form.Item>
                     <Button type="primary" onClick={handleSaveUser} loading={saving}>
@@ -496,7 +524,14 @@ const UserSettings: React.FC = () => {
                   gap: 8,
                 }}
               >
-                <Button type="primary" onClick={() => setModalVisible(true)}>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setEditingItem(null);
+                    editForm.resetFields();
+                    setModalVisible(true);
+                  }}
+                >
                   新增内容
                 </Button>
                 <Button onClick={handleSaveRecommendations} loading={saving}>
@@ -552,13 +587,16 @@ const UserSettings: React.FC = () => {
                           >
                             编辑
                           </Button>
-                          <Button 
-                            type="link" 
-                            danger
-                            onClick={() => handleRemoveFromRecommendations(item.id)}
+                          <Popconfirm
+                            title="是否确认删除？"
+                            onConfirm={() => handleRemoveFromRecommendations(item.id)}
+                            okText="确认"
+                            cancelText="取消"
                           >
-                            删除
-                          </Button>
+                            <Button type="link" danger>
+                              删除
+                            </Button>
+                          </Popconfirm>
                         </td>
                       </tr>
                     ))}
@@ -574,11 +612,7 @@ const UserSettings: React.FC = () => {
       <Modal
         title={editingItem ? "编辑推荐项目" : "添加推荐项目"}
         open={modalVisible}
-        onCancel={() => {
-          setModalVisible(false);
-          setEditingItem(null);
-          editForm.resetFields();
-        }}
+        onCancel={discardRecommendationModal}
         footer={null}
       >
         <Form
@@ -611,25 +645,35 @@ const UserSettings: React.FC = () => {
               </OptGroup>
             </Select>
           </Form.Item>
+
+          <p style={{ margin: '0 0 12px', color: 'rgba(0,0,0,0.45)', fontSize: 12 }}>
+            默认 / 悬停图先缓存在浏览器（blob 预览），确认列表无误后点击页面上的「保存配置」再统一上传服务器。
+          </p>
           
           <Form.Item
             name="defaultImage"
             label="默认图片"
-            rules={[{ required: true, message: '请上传默认图片' }]}
+            rules={[{ required: true, message: '请选择默认图片' }]}
           >
-            <RecommendationImageUpload />
+            <DeferredImageUpload
+              pendingFilesRef={recommendationPendingFilesRef}
+              commitHint="已选择，点击「保存配置」后上传服务器"
+            />
           </Form.Item>
 
           <Form.Item
             name="hoverImage"
             label="悬停图片"
-            rules={[{ required: true, message: '请上传悬停图片' }]}
+            rules={[{ required: true, message: '请选择悬停图片' }]}
           >
-            <RecommendationImageUpload />
+            <DeferredImageUpload
+              pendingFilesRef={recommendationPendingFilesRef}
+              commitHint="已选择，点击「保存配置」后上传服务器"
+            />
           </Form.Item>
           
           <Form.Item style={{ textAlign: 'right' }}>
-            <Button onClick={() => setModalVisible(false)} style={{ marginRight: '8px' }}>
+            <Button onClick={discardRecommendationModal} style={{ marginRight: '8px' }}>
               取消
             </Button>
             <Button type="primary" htmlType="submit">

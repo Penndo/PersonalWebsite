@@ -144,6 +144,8 @@ export const uploadApi = {
       },
     });
   },
+  /** 删除本站 public/uploads 下的文件（相对路径或完整 URL） */
+  deleteUpload: (url: string) => api.post<{ ok: boolean }>('/upload/remove', { url }),
 };
 
 export const getArticleDetail = async (
