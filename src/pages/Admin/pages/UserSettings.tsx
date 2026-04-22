@@ -147,10 +147,15 @@ const UserSettings: React.FC = () => {
     try {
       setUploading(true);
       const response = await uploadApi.uploadImage(file);
-      if (userInfo) {
-        setUserInfo({ ...userInfo, [field]: response.data.url });
-        message.success('上传成功');
+      const url = response.data?.url;
+      if (!url) {
+        message.error('上传响应无效');
+        return false;
       }
+      setUserInfo((prev) =>
+        prev ? { ...prev, [field]: url } : prev,
+      );
+      message.success('上传成功');
     } catch (error) {
       console.error('Upload failed:', error);
       message.error('上传失败，请重试');

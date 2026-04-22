@@ -26,11 +26,11 @@ export function collectUploadPathsFromRecommendations(items: RecommendedItem[]):
 }
 
 export function collectUploadPathsFromUser(
-  u: Pick<UserInfo, 'avatar' | 'wechatQRCode'> | null | undefined,
+  u: Pick<UserInfo, 'avatar' | 'wechatQRCode' | 'portfolio'> | null | undefined,
 ): Set<string> {
   const s = new Set<string>();
   if (!u) return s;
-  for (const key of ['avatar', 'wechatQRCode'] as const) {
+  for (const key of ['avatar', 'wechatQRCode', 'portfolio'] as const) {
     const c = canonicalUploadsPath(u[key]);
     if (c) s.add(c);
   }
