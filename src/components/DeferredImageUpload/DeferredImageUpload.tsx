@@ -107,6 +107,7 @@ const DeferredImageUpload: FC<DeferredImageUploadProps> = ({
         revokeIfBlob(value);
         onChange?.('');
       }}
+      style={{ border: 'none' }}
     >
       {fileList.length === 0 && pictureCardTrigger}
     </Upload>

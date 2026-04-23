@@ -1,14 +1,25 @@
-// 去掉 Tabs 导航栏底部默认分割线（::before 伪元素）
-.ant-tabs-nav::before {
-  display: none;
-}
+// 用户设置 Tabs 区域（不含挂到 body 的 Modal）
+.user-settings-tabs {
+  .ant-tabs-nav::before {
+    display: none;
+  }
 
-.ant-form-item {
-  margin-bottom: 16px;
-}
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
 
-.user-settings-form {
-  .ant-form-item-label {
-    padding-bottom: 4px;
+  .user-settings-form {
+    .ant-form-item-label {
+      padding-bottom: 4px;
+    }
   }
 }
+
+// 推荐内容编辑 Modal 默认渲染在 body 外，用 wrapClassName 限定样式
+
+  .ant-upload-wrapper .ant-upload-list.ant-upload-list-picture-card {
+    .ant-upload-list-item {
+      border: 1px dashed #d9d9d9;
+    }
+  }
+

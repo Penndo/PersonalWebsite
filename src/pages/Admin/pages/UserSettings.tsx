@@ -372,7 +372,7 @@ const UserSettings: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: '24px 48px' }}>
+    <div>
       <Card styles={{ body: { padding: 0 } }}>
         <Tabs
           className="user-settings-tabs"
