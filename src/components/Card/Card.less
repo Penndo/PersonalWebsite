@@ -1,21 +1,23 @@
 @import '@/styles/variables.less';
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
+  0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
 .card {
-  background: @bg-card;
-  backdrop-filter: blur(4px);
+  background: @surface-2;
+  backdrop-filter: blur(8px);
   border-radius: @border-radius-lg;
-  border: 1px solid @border-color;
+  border: 1px solid @line;
   overflow: hidden;
   cursor: pointer;
-  transition: box-shadow @transition-normal;
-  
+  transition: border-color @transition-normal, transform @transition-normal, box-shadow @transition-normal;
+
   &:hover {
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    border-color: @line-strong;
+    transform: translateY(-2px);
+    box-shadow: @shadow-card;
   }
 }
 
@@ -24,20 +26,21 @@
   flex-direction: column;
   gap: 16px;
   padding: 12px;
-  
+
   .card-cover {
     width: 100%;
     height: 250px;
     border-radius: @border-radius-sm;
     overflow: hidden;
     position: relative;
-    
+    background: @bg-card;       // 兜底色：暖深，与品牌一致
+
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .card-cover-placeholder {
       position: absolute;
       top: 0;
@@ -47,32 +50,32 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.1);
-      
+      background: @surface-1;
+
       .loading-spinner {
         width: 40px;
         height: 40px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-top-color: @primary-color;
+        border: 3px solid @line-strong;
+        border-top-color: @accent;
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
     }
   }
-  
+
   .card-cover-error {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(255, 183, 48, 0.1), rgba(255, 183, 48, 0.05));
-    
+    background: linear-gradient(135deg, fade(@accent, 8%), fade(@accent-warm, 4%));
+
     .error-placeholder {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      color: rgba(255, 255, 255, 0.6);
-      
+      color: @ink-faint;
+
       span {
         font-size: 14px;
       }
@@ -84,14 +87,15 @@
   display: flex;
   gap: 16px;
   padding: 12px;
-  
+
   .card-cover {
     width: 176px;
     height: 132px;
     border-radius: @border-radius-sm;
     overflow: hidden;
     flex-shrink: 0;
-    
+    background: @bg-card;
+
     img {
       width: 100%;
       height: 100%;
@@ -110,13 +114,14 @@
 .card-title {
   font-size: 18px;
   font-weight: 600;
-  color: @text-primary;
+  color: @ink;
   margin: 0;
+  letter-spacing: -0.005em;
 }
 
 .card-description {
   font-size: 14px;
-  color: @text-tertiary;
+  color: @ink-faint;
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;

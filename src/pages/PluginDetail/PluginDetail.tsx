@@ -143,7 +143,7 @@ const PluginDetail: React.FC = () => {
             {plugin.features.map((feature, index) => (
               <li key={index} className="feature-item">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 13L9 17L19 7" stroke="#ffb730" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <span>{feature}</span>
               </li>

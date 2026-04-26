@@ -10,7 +10,7 @@
   align-items: center;
   z-index: 100;
   pointer-events: none;
-  
+
   & > * {
     pointer-events: auto;
   }
@@ -22,21 +22,26 @@
   border-radius: @border-radius-lg;
   overflow: hidden;
   cursor: pointer;
-  transition: transform @transition-fast;
-  
+  transition: transform @transition-fast, box-shadow @transition-fast;
+  border: 1px solid @line;
+  background: @surface-2;
+  backdrop-filter: blur(8px);
+
   &:hover {
     transform: scale(1.05);
+    border-color: @line-strong;
+    box-shadow: 0 8px 24px -8px @accent-glow;
   }
-  
+
   .logo-avatar {
     width: 100%;
     height: 100%;
-    background: @glass-bg;
+    background: @bg-card;
     border-radius: @border-radius-lg;
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     img {
       width: 100%;
       height: 100%;
@@ -48,13 +53,23 @@
 .header-menu {
   width: 44px;
   height: 44px;
-  background: @glass-bg;
+  background: @surface-2;
+  border: 1px solid @line;
   border-radius: @border-radius-lg;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  
+  backdrop-filter: blur(8px);
+  color: @ink-dim;
+  transition: color @transition-fast, border-color @transition-fast, background @transition-fast;
+
+  &:hover {
+    color: @ink;
+    border-color: @line-strong;
+    background: @surface-3;
+  }
+
   .menu-icon {
     display: flex;
     align-items: center;

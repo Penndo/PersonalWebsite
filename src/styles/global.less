@@ -13,12 +13,17 @@ html {
 
 body {
   font-family: @font-family;
-  background-color: #000; // Deep dark background for the Aurora effect
-  color: @text-primary;
+  background-color: @bg-base;       // 与 GradientBackground 同源，避免空白态闪烁
+  color: @ink;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+::selection {
+  background: fade(@accent, 35%);
+  color: @ink;
 }
 
 a {
@@ -31,6 +36,7 @@ button {
   background: none;
   cursor: pointer;
   font-family: inherit;
+  color: inherit;
 }
 
 img {
@@ -42,33 +48,34 @@ ul, ol {
   list-style: none;
 }
 
+// ---------- Glass utilities ----------
 .glass-card {
-  background: @bg-card;
-  backdrop-filter: blur(4px);
+  background: @surface-2;
+  backdrop-filter: blur(8px);
   border-radius: @border-radius-lg;
-  border: 1px solid @border-color;
+  border: 1px solid @line;
 }
 
 .glass-button {
-  background: @glass-bg-light;
+  background: @surface-2;
   border-radius: @border-radius-sm;
   transition: background @transition-fast;
-  
+
   &:hover {
-    background: @glass-bg-lighter;
+    background: @surface-3;
   }
 }
 
 .gradient-border {
   position: relative;
-  
+
   &::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 100%);
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.18) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -78,65 +85,47 @@ ul, ol {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, @primary-color 0%, @primary-yellow 100%);
+  background: linear-gradient(135deg, @accent 0%, @accent-warm 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+// ---------- Animations ----------
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
 }
 
 @keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(5px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(5px); }
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
+.animate-float  { animation: float 3s ease-in-out infinite; }
+.animate-pulse  { animation: pulse 2s ease-in-out infinite; }
+.animate-bounce { animation: bounce 1.5s ease-in-out infinite; }
 
-.animate-pulse {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.animate-bounce {
-  animation: bounce 1.5s ease-in-out infinite;
-}
-
+// ---------- Scrollbar ----------
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: @bg-card;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: @glass-bg-lighter;
+  background: @line-strong;
   border-radius: 4px;
-  
+
   &:hover {
-    background: @glass-bg-white;
+    background: @ink-muted;
   }
 }

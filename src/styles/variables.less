@@ -1,35 +1,86 @@
-@primary-color: #FFD767;
-@primary-yellow: #FFDF2B;
-@bg-dark: rgb(36, 35, 19);
-@bg-dark-2: rgb(26, 26, 16);
-@bg-dark-3: rgb(20, 20, 14);
-@bg-card: #1C1D22;
-@bg-card-inner: #131418;
-@text-primary: #FFFFFF;
-@text-secondary: rgba(255, 255, 255, 0.88);
-@text-tertiary: rgba(255, 255, 255, 0.6);
-@border-color: #12120c;
-@glass-bg: rgba(10, 12, 11, 0.6);
-@glass-bg-light: rgba(255, 255, 255, 0.12);
-@glass-bg-lighter: rgba(255, 255, 255, 0.16);
-@glass-bg-white: rgba(255, 255, 255, 0.2);
+// ============================================================
+// Design System — single source of truth
+// Editorial / designer-portfolio palette: warm dark + ivory + brand yellow.
+// Older token names below are kept as aliases so existing components keep working.
+// Admin pages have their own light-theme system in admin-variables.less.
+// ============================================================
 
+// ---------- Brand ----------
+@accent:           #FFD767;                          // 主品牌黄（lemon）
+@accent-warm:      #FFB330;                          // 次品牌琥珀（CTA 渐变末端）
+@accent-deep:      #F89E22;                          // 深琥珀（hover / 深色文字配 accent 时备用）
+@accent-glow:      rgba(255, 215, 103, 0.18);
+@status-good:      #6FE3A1;                          // "available" 状态点
+
+// ---------- Surface ----------
+@bg-base:          #0E0E08;                          // 与 GradientBackground 同源
+@surface-1:        rgba(255, 255, 255, 0.025);       // 几乎透明：长文容器
+@surface-2:        rgba(255, 255, 255, 0.05);        // 一般卡片
+@surface-3:        rgba(255, 255, 255, 0.08);        // hover / 强调卡片
+@overlay-strong:   rgba(0, 0, 0, 0.55);              // 画廊导航等暗罩
+
+// ---------- Lines ----------
+@line-soft:        rgba(255, 255, 255, 0.06);        // 极弱分隔
+@line:             rgba(255, 255, 255, 0.10);        // 默认
+@line-strong:      rgba(255, 255, 255, 0.16);        // 强调
+
+// ---------- Ink (text) ----------
+@ink:              #F5EFE1;                          // 主文（不再纯白，保留编辑感暖度）
+@ink-dim:          rgba(245, 239, 225, 0.70);        // 副文 / 段落
+@ink-faint:        rgba(245, 239, 225, 0.45);        // 三级 / 占位
+@ink-muted:        rgba(245, 239, 225, 0.25);        // 极弱 / 装饰
+
+// ---------- Radius ----------
 @border-radius-sm: 8px;
 @border-radius-md: 12px;
 @border-radius-lg: 16px;
 @border-radius-xl: 80px;
 @border-radius-full: 109px;
+@radius-pill:      999px;
 
-@shadow-glass: 0 4px 30px rgba(0, 0, 0, 0.1);
-
-@font-family: 'Noto Sans SC', 'MiSans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-
-@transition-fast: 0.2s ease;
+// ---------- Motion ----------
+@ease-out:         cubic-bezier(0.2, 0.8, 0.2, 1);
+@transition-fast:  0.2s ease;
 @transition-normal: 0.3s ease;
-@transition-slow: 0.5s ease;
+@transition-slow:  0.5s ease;
 
-@screen-sm: 576px;
-@screen-md: 768px;
-@screen-lg: 992px;
-@screen-xl: 1200px;
+// ---------- Type ----------
+@font-family:      'Noto Sans SC', 'MiSans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+@font-mono:        ui-monospace, 'SF Mono', 'JetBrains Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+
+// ---------- Shadow ----------
+@shadow-glass:     0 4px 30px rgba(0, 0, 0, 0.10);
+@shadow-card:      0 24px 60px -30px rgba(0, 0, 0, 0.60);
+@shadow-cta:       0 12px 30px -12px fade(@accent, 60%);
+@shadow-cta-hover: 0 18px 40px -12px fade(@accent, 75%);
+
+// ---------- Breakpoints ----------
+@screen-sm:  576px;
+@screen-md:  768px;
+@screen-lg:  992px;
+@screen-xl:  1200px;
 @screen-xxl: 1440px;
+
+// ============================================================
+// Backwards-compatible aliases
+// (existing components reference these; keep stable so refactors stay localized)
+// ============================================================
+@primary-color:    @accent;
+@primary-yellow:   @accent-warm;
+
+@bg-dark:          #14140E;
+@bg-dark-2:        #11110B;
+@bg-dark-3:        @bg-base;        // #0E0E08
+@bg-card:          #171712;         // 实色暖深，给头像 / 实心卡片兜底
+@bg-card-inner:    @bg-base;
+
+@text-primary:     @ink;
+@text-secondary:   @ink-dim;
+@text-tertiary:    @ink-faint;
+
+@border-color:     @line;
+
+@glass-bg:         rgba(245, 239, 225, 0.04);
+@glass-bg-light:   rgba(245, 239, 225, 0.08);
+@glass-bg-lighter: rgba(245, 239, 225, 0.12);
+@glass-bg-white:   rgba(245, 239, 225, 0.18);

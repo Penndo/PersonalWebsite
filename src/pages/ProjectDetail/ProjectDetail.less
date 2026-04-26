@@ -1,7 +1,9 @@
+@import '@/styles/variables.less';
+
 .project-detail {
   min-height: 100vh;
   background: transparent;
-  color: #fff;
+  color: @ink;
   position: relative;
   overflow-x: hidden;
 }
@@ -20,8 +22,8 @@
 .loading-spinner {
   width: 48px;
   height: 48px;
-  border: 3px solid rgba(255, 183, 48, 0.2);
-  border-top-color: #ffb730;
+  border: 3px solid fade(@accent, 18%);
+  border-top-color: @accent;
   border-radius: 50%;
 }
 
@@ -29,22 +31,22 @@
   h2 {
     font-size: 2rem;
     margin-bottom: 1.5rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: @ink-dim;
   }
 
   button {
     padding: 0.75rem 2rem;
-    background: linear-gradient(135deg, #ffb730, #ff9630);
+    background: linear-gradient(135deg, @accent, @accent-warm);
     border: none;
-    border-radius: 8px;
-    color: #000;
+    border-radius: @border-radius-sm;
+    color: @bg-base;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform @transition-fast, box-shadow @transition-fast;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(255, 183, 48, 0.3);
+      box-shadow: @shadow-cta-hover;
     }
   }
 }
@@ -69,23 +71,23 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  background: @surface-2;
+  border: 1px solid @line;
+  border-radius: @border-radius-md;
+  color: @ink-dim;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.1s ease;
+  transition: color @transition-fast, background @transition-fast, border-color @transition-fast;
   backdrop-filter: blur(10px);
 
   svg {
-    transition: transform 0.3s ease;
+    transition: transform @transition-normal;
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 183, 48, 0.3);
-    color: #ffb730;
+    background: @surface-3;
+    border-color: fade(@accent, 35%);
+    color: @accent;
 
     svg {
       transform: translateX(-4px);
@@ -102,10 +104,11 @@
   font-weight: 700;
   line-height: 1.1;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #fff 0%, #ffb730 50%, #ff9630 100%);
+  background: linear-gradient(135deg, @ink 0%, @accent 55%, @accent-warm 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -0.02em;
 }
 
 .project-tags {
@@ -116,15 +119,15 @@
 
   .tag {
     padding: 6px 16px;
-    background: rgba(255, 183, 48, 0.1);
-    border: 1px solid rgba(255, 183, 48, 0.3);
-    border-radius: 20px;
+    background: fade(@accent, 8%);
+    border: 1px solid fade(@accent, 24%);
+    border-radius: @radius-pill;
     font-size: 0.85rem;
-    color: #ffb730;
-    transition: all 0.3s ease;
+    color: @accent;
+    transition: background @transition-normal, transform @transition-normal;
 
     &:hover {
-      background: rgba(255, 183, 48, 0.2);
+      background: fade(@accent, 16%);
       transform: translateY(-2px);
     }
   }
@@ -133,21 +136,21 @@
 .project-summary {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: rgba(255, 255, 255, 0.7);
+  color: @ink-dim;
   max-width: 800px;
 }
 
 .project-gallery {
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid @line-soft;
 }
 
 .gallery-main {
   position: relative;
   border-radius: 20px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: @surface-1;
+  border: 1px solid @line;
   aspect-ratio: 16/9;
   margin-bottom: 20px;
 
@@ -168,29 +171,24 @@
     transform: translateY(-50%);
     width: 48px;
     height: 48px;
-    background: rgba(0, 0, 0, 0.6);
+    background: @overlay-strong;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid @line;
     border-radius: 50%;
-    color: #fff;
+    color: @ink;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: background @transition-normal, border-color @transition-normal;
 
     &:hover {
-      background: rgba(255, 183, 48, 0.3);
-      border-color: rgba(255, 183, 48, 0.5);
+      background: fade(@accent, 28%);
+      border-color: fade(@accent, 50%);
     }
 
-    &.prev {
-      left: 20px;
-    }
-
-    &.next {
-      right: 20px;
-    }
+    &.prev { left: 20px; }
+    &.next { right: 20px; }
   }
 }
 
@@ -205,12 +203,12 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: @surface-1;
     border-radius: 2px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 183, 48, 0.3);
+    background: fade(@accent, 30%);
     border-radius: 2px;
   }
 
@@ -218,13 +216,13 @@
     flex-shrink: 0;
     width: 100px;
     height: 60px;
-    border-radius: 8px;
+    border-radius: @border-radius-sm;
     overflow: hidden;
     border: 2px solid transparent;
     background: transparent;
     cursor: pointer;
     padding: 0;
-    transition: all 0.3s ease;
+    transition: border-color @transition-normal, box-shadow @transition-normal;
 
     img {
       width: 100%;
@@ -233,62 +231,42 @@
     }
 
     &.active {
-      border-color: #ffb730;
-      box-shadow: 0 0 20px rgba(255, 183, 48, 0.3);
+      border-color: @accent;
+      box-shadow: 0 0 20px fade(@accent, 30%);
     }
 
     &:hover:not(.active) {
-      border-color: rgba(255, 183, 48, 0.5);
+      border-color: fade(@accent, 50%);
     }
   }
 }
 
 .project-info {
-
-  margin: 24px 0px;
+  margin: 24px 0;
 
   h1, h2, h3, h4, h5, h6 {
     margin-top: 24px;
     margin-bottom: 16px;
     font-weight: 600;
     line-height: 1.4;
-    color: rgba(255, 255, 255, 0.9);
+    color: @ink;
+    letter-spacing: -0.005em;
   }
 
-  h1 {
-    font-size: 2rem;//32px
-    padding-bottom: 8px;
-    // color: #ffb730;
-  }
-
-  h2 {
-    font-size: 1.5rem;//24px
-    padding-bottom: 6px;
-    // color: #ffb730;
-  }
-
-  h3 {
-    font-size: 1.25rem;//20px
-    // color: #ffb730;
-  }
-
-  h4 {
-    font-size: 1.125rem;//18px
-  }
-
-  h5 {
-    font-size: 1rem;//16px
-  }
-
+  h1 { font-size: 2rem;     padding-bottom: 8px; }
+  h2 { font-size: 1.5rem;   padding-bottom: 6px; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.125rem; }
+  h5 { font-size: 1rem; }
   h6 {
-    font-size: 0.875rem;//14px
-    color: rgba(255, 183, 48, 0.8);
+    font-size: 0.875rem;
+    color: fade(@accent, 80%);
   }
 
   p {
     margin-bottom: 16px;
     line-height: 1.8;
-    color: rgba(255, 255, 255, 0.75);
+    color: @ink-dim;
   }
 
   ul, ol {
@@ -296,54 +274,46 @@
     padding-left: 24px;
     list-style: initial;
   }
-
-  ul {
-    list-style-type: disc;
-  }
-
-  ol {
-    list-style-type: decimal;
-  }
+  ul { list-style-type: disc; }
+  ol { list-style-type: decimal; }
 
   li {
     margin-bottom: 8px;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.75);
+    color: @ink-dim;
     /* 与编辑器一致：列表项内换行在 HTML 中默认会被压成空格，需保留换行 */
     white-space: pre-line;
   }
 
   code {
-    background: rgba(255, 183, 48, 0.1);
+    background: fade(@accent, 8%);
     padding: 2px 6px;
     border-radius: 4px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-family: @font-mono;
     font-size: 1rem;
-    color: #ffb730;
+    color: @accent;
   }
 
   pre {
     background: rgba(0, 0, 0, 0.3);
     padding: 16px;
-    border-radius: 8px;
+    border-radius: @border-radius-sm;
     overflow-x: auto;
     margin-bottom: 16px;
-    border: 1px solid rgba(255, 183, 48, 0.1);
+    border: 1px solid @line-soft;
 
     code {
       background: transparent;
     }
-
   }
 
   blockquote {
-    border-left: 4px solid #ffb730;
-    padding-left: 16px;
-    margin: 16px 0;
-    color: rgba(255, 255, 255, 0.7);
-    background: rgba(255, 183, 48, 0.05);
+    border-left: 4px solid @accent;
     padding: 12px 16px;
-    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    color: @ink-dim;
+    background: fade(@accent, 4%);
+    border-radius: 0 @border-radius-sm @border-radius-sm 0;
   }
 
   table {
@@ -353,54 +323,57 @@
   }
 
   th, td {
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid @line;
     padding: 8px 12px;
     text-align: left;
-    color: rgba(255, 255, 255, 0.75);
+    color: @ink-dim;
   }
 
   th {
-    background: rgba(255, 183, 48, 0.1);
+    background: fade(@accent, 8%);
     font-weight: 600;
-    color: #ffb730;
+    color: @accent;
   }
 
   a {
-    color: #3094ff;
+    color: @accent;
     text-decoration: none;
+    border-bottom: 1px solid fade(@accent, 30%);
+    transition: border-color @transition-normal, color @transition-normal;
 
     &:hover {
-      text-decoration: underline;
+      color: @accent-warm;
+      border-color: @accent-warm;
     }
   }
 
   img {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: @border-radius-sm;
     margin: 16px 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid @line-soft;
   }
 
   hr {
     border: none;
-    border-top: 1px solid rgba(255, 183, 48, 0.2);
+    border-top: 1px solid @line-soft;
     margin: 24px 0;
   }
 }
 
 .info-section {
   padding: 32px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+  background: @surface-1;
+  border: 1px solid @line-soft;
+  border-radius: @border-radius-lg;
   backdrop-filter: blur(10px);
 
   h2 {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 16px;
-    color: #ffb730;
+    color: @accent;
     position: relative;
     padding-left: 16px;
 
@@ -412,7 +385,7 @@
       transform: translateY(-50%);
       width: 4px;
       height: 20px;
-      background: linear-gradient(180deg, #ffb730, #ff9630);
+      background: linear-gradient(180deg, @accent, @accent-warm);
       border-radius: 2px;
     }
   }
@@ -420,7 +393,7 @@
   p {
     font-size: 1rem;
     line-height: 1.8;
-    color: rgba(255, 255, 255, 0.75);
+    color: @ink-dim;
   }
 }
 
@@ -435,13 +408,13 @@
     margin-bottom: 12px;
     font-size: 1rem;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.75);
+    color: @ink-dim;
 
     &::before {
       content: '✓';
       position: absolute;
       left: 0;
-      color: #ffb730;
+      color: @accent;
       font-weight: bold;
     }
 
@@ -463,15 +436,16 @@
   gap: 4px;
 
   .meta-label {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    color: @ink-faint;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.12em;
+    font-family: @font-mono;
   }
 
   .meta-value {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: @ink;
     font-weight: 500;
   }
 }
@@ -481,21 +455,22 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #ffb730, #ff9630);
-  border-radius: 12px;
-  color: #000;
-  font-size: 1.1rem;
+  background: linear-gradient(135deg, @accent, @accent-warm);
+  border-radius: @border-radius-md;
+  color: @bg-base;
+  font-size: 1.05rem;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(255, 183, 48, 0.3);
+  transition: box-shadow @transition-normal, transform @transition-normal;
+  box-shadow: @shadow-cta;
 
   svg {
-    transition: transform 0.3s ease;
+    transition: transform @transition-normal;
   }
 
   &:hover {
-    box-shadow: 0 8px 32px rgba(255, 183, 48, 0.5);
+    box-shadow: @shadow-cta-hover;
+    transform: translateY(-1px);
 
     svg {
       transform: translate(4px, -4px);
@@ -503,7 +478,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: @screen-md) {
   .project-detail-content {
     padding: 80px 20px 40px;
   }
@@ -529,13 +504,8 @@
       width: 40px;
       height: 40px;
 
-      &.prev {
-        left: 10px;
-      }
-
-      &.next {
-        right: 10px;
-      }
+      &.prev { left: 10px; }
+      &.next { right: 10px; }
     }
   }
 

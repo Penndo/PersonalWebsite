@@ -5,14 +5,13 @@
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  background: linear-gradient(180deg, #FFED67 0%, #FFB330 100%);
+  background: linear-gradient(180deg, @accent 0%, @accent-warm 100%);
   border-radius: @border-radius-sm;
   border: 1px solid transparent;
   background-clip: padding-box;
-  box-shadow: 0 4px 16px 0 rgba(88, 43, 4, 0.30);
+  box-shadow: @shadow-cta;
   cursor: pointer;
-  transition: all @transition-fast;
-  border-radius: 8px;
+  transition: box-shadow @transition-fast, transform @transition-fast;
   position: relative;
 
   &::before {
@@ -30,13 +29,19 @@
   }
 
   &:hover {
-    box-shadow: 0 6px 30px rgba(255, 215, 103, 0.5);
+    box-shadow: @shadow-cta-hover;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
 .button-text {
   font-size: 14px;
-  font-weight: 500;
-  color: @bg-card;
+  font-weight: 600;
+  color: @bg-base;          // 黄底配深暖色文字，与品牌一致
   white-space: nowrap;
+  letter-spacing: 0.01em;
 }

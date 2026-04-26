@@ -3,10 +3,11 @@
 .tab-nav {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   padding: 4px;
-  background: @glass-bg;
-  backdrop-filter: blur(8px);
+  background: @surface-2;
+  border: 1px solid @line;
+  backdrop-filter: blur(12px);
   border-radius: @border-radius-lg;
   width: fit-content;
   margin: 0 auto;
@@ -17,17 +18,21 @@
   padding: 8px 24px;
   border-radius: @border-radius-md;
   cursor: pointer;
-  transition: all @transition-fast;
+  transition: color @transition-fast, background @transition-fast;
   min-width: 80px;
   text-align: center;
-  
+
   &:hover:not(.active) {
-    background: @glass-bg-lighter;
+    background: @surface-2;
+
+    .tab-label {
+      color: @ink-dim;
+    }
   }
-  
+
   &.active {
     .tab-label {
-      color: @primary-yellow;
+      color: @accent;
       font-weight: 500;
     }
   }
@@ -36,10 +41,10 @@
 .tab-active-bg {
   position: absolute;
   inset: 0;
-  background: @glass-bg-light;
+  background: @surface-3;
   border-radius: @border-radius-md;
   z-index: 0;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -59,7 +64,8 @@
   position: relative;
   z-index: 1;
   font-size: 14px;
-  color: @text-tertiary;
+  color: @ink-faint;
   font-weight: 380;
   transition: color @transition-fast;
+  letter-spacing: 0.01em;
 }
