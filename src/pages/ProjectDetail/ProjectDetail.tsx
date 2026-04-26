@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Header } from '@/components';
+import { Header, GradientBackground, DynamicParticles } from '@/components';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -66,6 +66,8 @@ const ProjectDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="project-detail">
+        <GradientBackground />
+        <DynamicParticles />
         <Header />
         <div className="project-detail-loading">
           <motion.div 
@@ -81,6 +83,8 @@ const ProjectDetail: React.FC = () => {
   if (!project) {
     return (
       <div className="project-detail">
+        <GradientBackground />
+        <DynamicParticles />
         <Header />
         <div className="project-detail-error">
           <h2>项目未找到</h2>
@@ -93,6 +97,8 @@ const ProjectDetail: React.FC = () => {
 
   return (
     <div className="project-detail">
+      <GradientBackground />
+      <DynamicParticles />
       <Header />
       
       <motion.div 

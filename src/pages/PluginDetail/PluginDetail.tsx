@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Header } from '@/components';
+import { Header, GradientBackground, DynamicParticles } from '@/components';
 import { getPluginDetail } from '@/services/api';
 import type { PluginDetail as PluginDetailType } from '@/types';
 import './PluginDetail.less';
@@ -41,6 +41,8 @@ const PluginDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="plugin-detail">
+        <GradientBackground />
+        <DynamicParticles />
         <Header />
         <div className="plugin-detail-loading">
           <motion.div 
@@ -56,6 +58,8 @@ const PluginDetail: React.FC = () => {
   if (!plugin) {
     return (
       <div className="plugin-detail">
+        <GradientBackground />
+        <DynamicParticles />
         <Header />
         <div className="plugin-detail-error">
           <h2>插件未找到</h2>
@@ -67,6 +71,8 @@ const PluginDetail: React.FC = () => {
 
   return (
     <div className="plugin-detail">
+      <GradientBackground />
+      <DynamicParticles />
       <Header />
       
       <motion.div 

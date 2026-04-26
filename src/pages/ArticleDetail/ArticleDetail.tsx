@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Header } from '@/components';
+import { Header, GradientBackground, DynamicParticles } from '@/components';
 import { getArticleDetail } from '@/services/api';
 import type { ArticleDetail as ArticleDetailType } from '@/types';
 import './ArticleDetail.less';
@@ -41,6 +41,8 @@ const ArticleDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="article-detail">
+        <GradientBackground />
+        <DynamicParticles />
         <Header />
         <div className="article-detail-loading">
           <motion.div 
@@ -56,6 +58,8 @@ const ArticleDetail: React.FC = () => {
   if (!article) {
     return (
       <div className="article-detail">
+        <GradientBackground />
+        <DynamicParticles />
         <Header />
         <div className="article-detail-error">
           <h2>文章未找到</h2>
@@ -67,6 +71,8 @@ const ArticleDetail: React.FC = () => {
 
   return (
     <div className="article-detail">
+      <GradientBackground />
+      <DynamicParticles />
       <Header />
       
       <motion.div 
