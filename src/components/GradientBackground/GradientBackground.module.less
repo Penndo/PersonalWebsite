@@ -1,106 +1,88 @@
+// ---------- Editorial ambient background ----------
+// Tokens local to this layer; intentionally not pulled from variables.less so the
+// background can be tuned without touching the rest of the design system.
+
+@bg-base: #0E0E08;          // 深暖黑底（比 homepage bg-dark-3 #14140E 略深一档）
+@bg-base-2: #08080A;        // vignette 边缘
+@orb-warm: rgba(255, 215, 103, 0.10);   // 主品牌黄
+@orb-warm-edge: rgba(255, 215, 103, 0);
+@orb-deep: rgba(255, 179, 48, 0.075);   // 暗黄/琥珀
+@orb-deep-edge: rgba(255, 179, 48, 0);
+@grid-dot: rgba(245, 239, 225, 0.045);
+
 .gradientBackground {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
   background:
-    radial-gradient(circle at 10% -10%, rgba(250, 204, 21, 0.18) 0, #0b1120 55%),
-    radial-gradient(circle at 90% 120%, rgba(245, 158, 11, 0.2) 0, #020617 60%),
-    radial-gradient(circle at 0% 100%, rgba(253, 224, 71, 0.18) 0, #020617 55%),
-    #020617;
+    radial-gradient(120% 90% at 78% 12%, rgba(255, 215, 103, 0.05) 0%, transparent 55%),
+    radial-gradient(110% 100% at 18% 92%, rgba(255, 179, 48, 0.04) 0%, transparent 60%),
+    @bg-base;
 }
 
-.gradientOrb {
+// ---------- Warm orbs ----------
+.orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  mix-blend-mode: screen;
-  will-change: transform, opacity;
-}
-
-.orb1 {
-  width: 800px;
-  height: 800px;
-  background: radial-gradient(circle, rgba(253, 224, 71, 0.35) 0%, transparent 70%);
-  top: -20%;
-  left: -10%;
-}
-
-.orb2 {
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
-  top: 15%;
-  right: -15%;
-}
-
-.orb3 {
-  width: 650px;
-  height: 650px;
-  background: radial-gradient(circle, rgba(234, 179, 8, 0.26) 0%, transparent 70%);
-  bottom: 5%;
-  left: 20%;
-}
-
-.orb4 {
-  width: 750px;
-  height: 750px;
-  background: radial-gradient(circle, rgba(250, 204, 21, 0.28) 0%, transparent 70%);
-  bottom: -20%;
-  right: 15%;
-}
-
-.orbAccent {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(252, 211, 77, 0.3) 0%, transparent 70%);
-  top: 40%;
-  left: 40%;
   filter: blur(120px);
+  will-change: transform;
+  pointer-events: none;
 }
 
-/* Diagonal light streaks for more dynamism */
-.gradientBackground::before,
-.gradientBackground::after {
-  content: '';
+.orbWarm {
+  width: 720px;
+  height: 720px;
+  top: -22%;
+  right: -14%;
+  background: radial-gradient(circle at 50% 50%, @orb-warm 0%, @orb-warm-edge 70%);
+}
+
+.orbDeep {
+  width: 640px;
+  height: 640px;
+  bottom: -22%;
+  left: -16%;
+  background: radial-gradient(circle at 50% 50%, @orb-deep 0%, @orb-deep-edge 70%);
+}
+
+// ---------- Designer-signature dot grid ----------
+.dotGrid {
   position: absolute;
-  inset: -20%;
+  inset: 0;
+  background-image: radial-gradient(@grid-dot 1.1px, transparent 1.4px);
+  background-size: 28px 28px;
+  background-position: 0 0;
+  // Soft mask so the grid fades at the edges and doesn't draw a hard rectangle
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 100%);
+  opacity: 0.85;
+}
+
+// ---------- Vignette: anchors visual focus to center ----------
+.vignette {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
-  mix-blend-mode: screen;
-  opacity: 0.45;
   background:
-    linear-gradient(
-      120deg,
-      transparent 0%,
-      rgba(253, 224, 71, 0.06) 30%,
-      rgba(251, 191, 36, 0.22) 48%,
-      rgba(253, 224, 71, 0.06) 66%,
-      transparent 100%
-    );
-  filter: blur(40px);
+    radial-gradient(120% 100% at 50% 40%, transparent 35%, rgba(0, 0, 0, 0.35) 75%, rgba(0, 0, 0, 0.55) 100%);
 }
 
-.gradientBackground::before {
-  transform: translate3d(-10%, -5%, 0) rotate(-6deg);
-}
-
-.gradientBackground::after {
-  transform: translate3d(12%, 8%, 0) rotate(8deg);
-  opacity: 0.32;
-}
-
-.grainOverlay {
+// ---------- Grain: tactile noise (SVG fractal noise) ----------
+.grain {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
-  z-index: 2;
-  opacity: 0.06;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.28;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
+  background-size: 220px 220px;
+}
+
+// ---------- Reduced motion ----------
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    animation: none !important;
+  }
 }

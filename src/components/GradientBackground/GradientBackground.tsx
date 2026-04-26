@@ -3,84 +3,49 @@ import { motion } from 'framer-motion';
 import styles from './GradientBackground.module.less';
 
 /**
- * GradientBackground Component
- * @description Provides a modern, advanced "Aurora" or "Mesh" gradient background effect.
- * Uses Framer Motion for smooth, organic movement of color orbs.
- * @returns {JSX.Element} The rendered component.
+ * GradientBackground
+ * Editorial-grade ambient layer for a designer portfolio.
+ * - Warm-dark base (#0E0E08) aligned with the homepage palette
+ * - Two restrained warm orbs anchored off-screen, slow orbital drift
+ * - Static dot grid as quiet textural signature
+ * - Soft vignette + grain to anchor focus and add tactile depth
+ *
+ * No purple/pink/cyan; no aurora chaos; no diagonal light streaks.
+ * The background supports the type — never competes with it.
  */
 const GradientBackground: React.FC = () => {
   return (
-    <div className={styles.gradientBackground}>
-      {/* Primary Aurora Orbs */}
+    <div className={styles.gradientBackground} aria-hidden="true">
       <motion.div
-        className={`${styles.gradientOrb} ${styles.orb1}`}
+        className={`${styles.orb} ${styles.orbWarm}`}
         animate={{
-          x: [0, 150, 50, -100, 0],
-          y: [0, 80, 180, 80, 0],
-          scale: [1, 1.3, 1.1, 0.9, 1],
+          x: [0, 60, -20, 0],
+          y: [0, -40, 30, 0],
+          scale: [1, 1.06, 0.96, 1],
         }}
         transition={{
-          duration: 25,
+          duration: 56,
           repeat: Infinity,
-          ease: "easeInOut",
+          ease: 'easeInOut',
         }}
       />
       <motion.div
-        className={`${styles.gradientOrb} ${styles.orb2}`}
+        className={`${styles.orb} ${styles.orbDeep}`}
         animate={{
-          x: [0, -120, -180, -60, 0],
-          y: [0, 120, 60, 180, 0],
-          scale: [1, 0.85, 1.15, 1, 1],
+          x: [0, -50, 30, 0],
+          y: [0, 50, -20, 0],
+          scale: [1, 0.94, 1.08, 1],
         }}
         transition={{
-          duration: 22,
+          duration: 64,
           repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className={`${styles.gradientOrb} ${styles.orb3}`}
-        animate={{
-          x: [0, 100, 180, 100, 0],
-          y: [0, -100, -50, -150, 0],
-          scale: [1, 1.2, 0.9, 1.1, 1],
-        }}
-        transition={{
-          duration: 28,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className={`${styles.gradientOrb} ${styles.orb4}`}
-        animate={{
-          x: [0, -60, -120, -30, 0],
-          y: [0, 150, 90, 30, 0],
-          scale: [1, 1.25, 1, 0.85, 1],
-        }}
-        transition={{
-          duration: 30,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      
-      {/* Accent "Glitch" Orbs for more depth */}
-      <motion.div
-        className={`${styles.gradientOrb} ${styles.orbAccent}`}
-        animate={{
-          opacity: [0.1, 0.2, 0.1],
-          scale: [1, 1.5, 1],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "linear",
+          ease: 'easeInOut',
         }}
       />
 
-      {/* Grainy Texture Overlay */}
-      <div className={styles.grainOverlay} />
+      <div className={styles.dotGrid} />
+      <div className={styles.vignette} />
+      <div className={styles.grain} />
     </div>
   );
 };

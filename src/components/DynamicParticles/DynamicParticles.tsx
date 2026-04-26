@@ -1,24 +1,26 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './DynamicParticles.module.less';
 
-interface Particle {
+interface Dust {
   x: number;
   y: number;
   vx: number;
   vy: number;
   size: number;
-  color: string;
-  layer: 0 | 1;
+  alpha: number;
+  twinkleSeed: number;
 }
 
 /**
- * DynamicParticles Component
- * @description A high-performance canvas-based particle background with interactive elements.
- * @returns {JSX.Element} The rendered component.
+ * DynamicParticles
+ * Cursor-reactive layer for a designer portfolio:
+ *  - A soft warm "spotlight" that smoothly trails the cursor (Brittany Chiang style)
+ *  - A sparse field of slow-drifting "stardust" — no connection lines, no mouse repulsion
+ *
+ * Disabled on touch devices and when prefers-reduced-motion is set.
  */
 const DynamicParticles: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef<{ x: number | null; y: number | null }>({ x: null, y: null });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -27,138 +29,133 @@ const DynamicParticles: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId: number;
-    let particles: Particle[] = [];
-    const particleCount = 170;
-    const baseConnectionDistance = 150;
-    const mouseRadius = 200;
+    const isTouch =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
       window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /**
-     * Initializes the canvas size and particles.
-     */
-    const init = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      particles = [];
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      const palette = [
-        'rgba(56, 189, 248, 0.45)',  // cyan
-        'rgba(129, 140, 248, 0.42)', // indigo
-        'rgba(244, 114, 182, 0.42)', // pink
-        'rgba(251, 191, 36, 0.24)',  // amber accent
-      ];
+    let dust: Dust[] = [];
+    let animationId = 0;
+    let frame = 0;
 
-      for (let i = 0; i < particleCount; i++) {
-        const layer: 0 | 1 = Math.random() > 0.65 ? 1 : 0;
-        const speedFactor = layer ? 0.7 : 0.35;
-        const baseSize = layer ? Math.random() * 2.2 + 1.2 : Math.random() * 1.6 + 0.4;
+    // Smoothed cursor position (lerped target)
+    const cursor = { x: -9999, y: -9999, tx: -9999, ty: -9999, active: false };
 
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * speedFactor,
-          vy: (Math.random() - 0.5) * speedFactor,
-          size: baseSize,
-          color: palette[Math.floor(Math.random() * palette.length)],
-          layer,
-        });
+    const resize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      seedDust(w, h);
+    };
+
+    const seedDust = (w: number, h: number) => {
+      // Density scales gently with viewport area; keep it sparse.
+      const target = Math.min(22, Math.max(10, Math.round((w * h) / 110000)));
+      dust = Array.from({ length: target }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.08,
+        vy: (Math.random() - 0.5) * 0.06 - 0.015, // slight upward bias
+        size: Math.random() * 0.7 + 0.7,           // 0.7–1.4px
+        alpha: Math.random() * 0.25 + 0.25,        // 0.25–0.5
+        twinkleSeed: Math.random() * Math.PI * 2,
+      }));
+    };
+
+    const drawSpotlight = () => {
+      if (!cursor.active || isTouch) return;
+      const radius = 320;
+      const grad = ctx.createRadialGradient(cursor.x, cursor.y, 0, cursor.x, cursor.y, radius);
+      grad.addColorStop(0, 'rgba(255, 215, 103, 0.085)');
+      grad.addColorStop(0.45, 'rgba(255, 215, 103, 0.025)');
+      grad.addColorStop(1, 'rgba(255, 215, 103, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(cursor.x - radius, cursor.y - radius, radius * 2, radius * 2);
+    };
+
+    const drawDust = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for (const d of dust) {
+        d.x += d.vx;
+        d.y += d.vy;
+        // Wrap around the viewport instead of bouncing — feels calmer.
+        if (d.x < -8) d.x = w + 8;
+        else if (d.x > w + 8) d.x = -8;
+        if (d.y < -8) d.y = h + 8;
+        else if (d.y > h + 8) d.y = -8;
+
+        const twinkle = 0.85 + Math.sin(frame * 0.012 + d.twinkleSeed) * 0.15;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(245, 239, 225, ${d.alpha * twinkle})`;
+        ctx.fill();
       }
     };
 
-    /**
-     * Animation loop for particles.
-     */
-    const animate = () => {
+    const tick = () => {
+      // Lerp cursor toward target for smooth trailing
+      cursor.x += (cursor.tx - cursor.x) * 0.08;
+      cursor.y += (cursor.ty - cursor.y) * 0.08;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((p, i) => {
-        // Basic movement
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Boundary check
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        // Mouse interaction
-        if (mouseRef.current.x !== null && mouseRef.current.y !== null) {
-          const dx = p.x - mouseRef.current.x;
-          const dy = p.y - mouseRef.current.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < mouseRadius) {
-            const force = (mouseRadius - distance) / mouseRadius;
-            p.x += dx * force * 0.05;
-            p.y += dy * force * 0.05;
-          }
-        }
-
-        // Draw particle
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-
-        // Draw connections
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          const sameLayer = p.layer === p2.layer;
-          const connectionDistance = sameLayer ? baseConnectionDistance + 40 : baseConnectionDistance - 30;
-
-          if (distance < connectionDistance) {
-            const opacity = (1 - distance / connectionDistance) * (sameLayer ? 0.22 : 0.14);
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(148, 163, 184, ${opacity})`;
-            ctx.lineWidth = sameLayer ? 0.7 : 0.4;
-            ctx.stroke();
-          }
-        }
-      });
+      drawSpotlight();
+      drawDust();
+      frame++;
 
       if (!prefersReducedMotion) {
-        animationFrameId = requestAnimationFrame(animate);
+        animationId = requestAnimationFrame(tick);
       }
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
+      cursor.tx = e.clientX;
+      cursor.ty = e.clientY;
+      if (!cursor.active) {
+        cursor.x = e.clientX;
+        cursor.y = e.clientY;
+        cursor.active = true;
+      }
     };
 
     const handleMouseLeave = () => {
-      mouseRef.current = { x: null, y: null };
+      cursor.active = false;
     };
 
-    const handleResize = () => {
-      init();
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('mouseleave', handleMouseLeave);
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', resize);
 
-    init();
-    animate();
+    resize();
+
+    if (prefersReducedMotion) {
+      // Render a single static frame so dust still shows quietly.
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawDust();
+    } else {
+      tick();
+    }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationId);
     };
   }, []);
 
-  return <canvas ref={canvasRef} className={styles.canvas} />;
+  return <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />;
 };
 
 export default DynamicParticles;

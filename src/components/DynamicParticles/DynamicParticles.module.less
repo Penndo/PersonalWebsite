@@ -1,11 +1,18 @@
 .canvas {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 1; // Above gradient background (0), below content
-  opacity: 0.8;
+  // Above GradientBackground (z 0), below page content
+  z-index: 1;
+  // 'screen' lifts the warm spotlight on the dark base without crushing the dust
   mix-blend-mode: screen;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas {
+    opacity: 0.6;
+  }
 }
