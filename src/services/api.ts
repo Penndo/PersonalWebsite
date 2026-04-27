@@ -27,6 +27,116 @@ const api = axios.create({
   },
 });
 
+// ---------- Admin Auth (token in localStorage, Bearer header) ----------
+
+const AUTH_TOKEN_KEY = 'admin_auth_token';
+const AUTH_USERNAME_KEY = 'admin_auth_username';
+const AUTH_EXPIRES_KEY = 'admin_auth_expires_at';
+
+export const authStorage = {
+  getToken(): string | null {
+    try {
+      return localStorage.getItem(AUTH_TOKEN_KEY);
+    } catch {
+      return null;
+    }
+  },
+  getUsername(): string | null {
+    try {
+      return localStorage.getItem(AUTH_USERNAME_KEY);
+    } catch {
+      return null;
+    }
+  },
+  getExpiresAt(): number | null {
+    try {
+      const raw = localStorage.getItem(AUTH_EXPIRES_KEY);
+      if (!raw) return null;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : null;
+    } catch {
+      return null;
+    }
+  },
+  set(token: string, username: string, expiresAt?: number): void {
+    try {
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      localStorage.setItem(AUTH_USERNAME_KEY, username);
+      if (typeof expiresAt === 'number') {
+        localStorage.setItem(AUTH_EXPIRES_KEY, String(expiresAt));
+      } else {
+        localStorage.removeItem(AUTH_EXPIRES_KEY);
+      }
+    } catch {
+      /* ignore */
+    }
+  },
+  clear(): void {
+    try {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(AUTH_USERNAME_KEY);
+      localStorage.removeItem(AUTH_EXPIRES_KEY);
+    } catch {
+      /* ignore */
+    }
+  },
+  hasFreshToken(): boolean {
+    const token = authStorage.getToken();
+    if (!token) return false;
+    const expiresAt = authStorage.getExpiresAt();
+    if (typeof expiresAt === 'number' && expiresAt <= Date.now()) {
+      return false;
+    }
+    return true;
+  },
+};
+
+api.interceptors.request.use((config) => {
+  const token = authStorage.getToken();
+  if (token) {
+    config.headers = config.headers ?? {};
+    (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+let onUnauthorized: (() => void) | null = null;
+
+/** 由前端路由层注册：401 时清空登录态并跳回登录页 */
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler;
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    if (status === 401) {
+      authStorage.clear();
+      if (onUnauthorized) onUnauthorized();
+    }
+    return Promise.reject(error);
+  },
+);
+
+interface LoginResponse {
+  token: string;
+  username: string;
+  expiresAt: number;
+}
+
+export const authApi = {
+  login: (username: string, password: string) =>
+    api.post<LoginResponse>('/auth/login', { username, password }),
+  logout: () => api.post<{ ok: boolean }>('/auth/logout'),
+  me: () => api.get<{ username: string }>('/auth/me'),
+  changePassword: (oldPassword: string, newPassword: string) =>
+    api.post<{ ok: boolean }>('/auth/change-password', {
+      oldPassword,
+      newPassword,
+    }),
+};
+
 export const userApi = {
   getUserInfo: () => api.get<UserInfo>('/user/profile'),
   updateUserInfo: (data: Partial<UserInfo>) =>

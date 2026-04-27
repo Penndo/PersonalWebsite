@@ -9,6 +9,8 @@ import TabsSettings from '@/pages/Admin/pages/TabsSettings';
 import ProjectsManage from '@/pages/Admin/pages/ProjectsManage';
 import ArticlesManage from '@/pages/Admin/pages/ArticlesManage';
 import PluginsManage from '@/pages/Admin/pages/PluginsManage';
+import AdminLogin from '@/pages/Admin/AdminLogin';
+import RequireAuth from '@/pages/Admin/RequireAuth';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -18,7 +20,15 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/project/:id" element={<ProjectDetail />} />
         <Route path="/article/:id" element={<ArticleDetail />} />
         <Route path="/plugin/:id" element={<PluginDetail />} />
-        <Route path="/admin" element={<Admin />}>
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth>
+              <Admin />
+            </RequireAuth>
+          }
+        >
           <Route index element={<Navigate to="/admin/user" replace />} />
           <Route path="user" element={<UserSettings />} />
           <Route path="tabs" element={<TabsSettings />} />

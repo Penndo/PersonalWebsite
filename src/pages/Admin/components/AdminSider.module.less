@@ -1,0 +1,38 @@
+// 侧栏宽度过渡时避免标题文字换行/纵向排字，并在窄宽下横向裁剪
+.siderHeader {
+  height: 64px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 10px;
+  overflow: hidden; // 与父级动画宽度同步，裁掉被挤入窄区的文字
+  flex-shrink: 0;
+}
+
+// 展开/收起与宽度动画不同步时：只显示一行，不竖排
+.siderTitle {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  max-width: 100%;
+  min-width: 0; // 允许在 flex/动画父级中收缩
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.siderIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 22px;
+  line-height: 1; // 避免行高在窄宽下被拉伸成多行
+}

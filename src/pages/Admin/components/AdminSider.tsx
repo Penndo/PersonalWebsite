@@ -5,8 +5,10 @@ import {
   ProjectOutlined,
   FileTextOutlined,
   ApiOutlined,
+  ControlOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
+import styles from './AdminSider.module.less';
 
 const { Sider } = Layout;
 
@@ -47,19 +49,27 @@ const AdminSider: React.FC<AdminSiderProps> = ({ collapsed }) => {
   const location = useLocation();
 
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed} theme="dark">
-      <div
-        style={{
-          height: 64,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 24px',
-        }}
-      >
-        <span style={{ color: 'rgba(255, 255, 255, 0.88)', fontSize: 18, fontWeight: 600 }}>
-          {collapsed ? '管理' : '后台管理'}
-        </span>
+    <Sider
+      trigger={null}
+      collapsible
+      collapsed={collapsed}
+      collapsedWidth={64}
+      theme="dark"
+    >
+      <div className={styles.siderHeader}>
+        {collapsed ? (
+          <span
+            className={styles.siderIcon}
+            title="后台管理"
+            aria-label="后台管理"
+          >
+            <ControlOutlined />
+          </span>
+        ) : (
+          <span className={styles.siderTitle} title="后台管理">
+            后台管理
+          </span>
+        )}
       </div>
       <Menu
         theme="dark"

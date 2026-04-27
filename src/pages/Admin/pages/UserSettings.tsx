@@ -1,14 +1,149 @@
-import { useEffect, useState, useRef } from 'react';
-import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Modal, Select, Popconfirm} from 'antd';
+import { useEffect, useState, useRef, type FC } from 'react';
+import { Card, Form, Input, InputNumber, Button, Spin, message, Tabs, Upload, Modal, Select, Popconfirm } from 'antd';
 const { Option, OptGroup } = Select;
-import { UploadOutlined } from '@ant-design/icons';
-import { userApi, projectApi, articleApi, pluginApi, uploadApi, recommendationApi } from '@/services/api';
+import { LockOutlined, UploadOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { authApi, authStorage, userApi, projectApi, articleApi, pluginApi, uploadApi, recommendationApi } from '@/services/api';
 import type { UserInfo, Project, Article, Plugin, RecommendedItem } from '@/types';
 import './UserSettings.less';
 import DeferredImageUpload, { clearAllDeferredBlobs } from '@/components/DeferredImageUpload/DeferredImageUpload';
 import { collectUploadPathsFromRecommendations, collectUploadPathsFromUser } from '@/utils/uploads';
 
 const { TabPane } = Tabs;
+
+const RECOMMENDATION_THUMB_PX = 64;
+
+/** 推荐列表中 default / hover 图仅表格内以 64×64 展示；上传不限制像素尺寸 */
+const RecommendationTableThumb: FC<{ src?: string; alt: string }> = ({ src, alt }) => {
+  const [broken, setBroken] = useState(false);
+  useEffect(() => {
+    setBroken(false);
+  }, [src]);
+  if (!src || broken) {
+    return <span className="recommendation-thumb--empty">-</span>;
+  }
+  return (
+    <img
+      className="recommendation-thumb"
+      src={src}
+      alt={alt}
+      width={RECOMMENDATION_THUMB_PX}
+      height={RECOMMENDATION_THUMB_PX}
+      loading="lazy"
+      onError={() => setBroken(true)}
+    />
+  );
+};
+
+interface ChangePasswordFormValues {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+/** 修改管理员密码：服务端只保存 scrypt 哈希，明文不会落库；改完后旧 token 失效，需要重新登录 */
+const ChangePasswordPanel: FC = () => {
+  const [form] = Form.useForm<ChangePasswordFormValues>();
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const username = authStorage.getUsername() ?? '当前用户';
+
+  const handleSubmit = async (values: ChangePasswordFormValues) => {
+    setSubmitting(true);
+    try {
+      await authApi.changePassword(values.oldPassword, values.newPassword);
+      message.success('密码已更新，请使用新密码重新登录');
+      authStorage.clear();
+      form.resetFields();
+      navigate('/admin/login', { replace: true });
+    } catch (err: unknown) {
+      const tip =
+        (err as { response?: { data?: { message?: string } }; message?: string })
+          ?.response?.data?.message ??
+        (err as { message?: string })?.message ??
+        '修改密码失败，请重试';
+      message.error(tip);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: 24 }}>
+      <Card style={{ border: 'none' }} styles={{ body: { padding: 0 } }}>
+        <p style={{ margin: '0 0 16px', color: 'rgba(0,0,0,0.55)', fontSize: 13 }}>
+          当前账号：<strong>{username}</strong>。修改密码后会自动退出登录，需要使用新密码重新登入。
+          服务端仅保存密码的 scrypt 哈希（含随机盐），不会保存明文。
+        </p>
+        <Form<ChangePasswordFormValues>
+          form={form}
+          layout="vertical"
+          requiredMark={false}
+          onFinish={handleSubmit}
+          autoComplete="off"
+          style={{ maxWidth: 420 }}
+        >
+          <Form.Item
+            label="原密码"
+            name="oldPassword"
+            rules={[{ required: true, message: '请输入原密码' }]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="请输入原密码"
+              autoComplete="current-password"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="新密码"
+            name="newPassword"
+            rules={[
+              { required: true, message: '请输入新密码' },
+              { min: 6, message: '新密码长度至少 6 位' },
+              { max: 64, message: '新密码长度不能超过 64 位' },
+            ]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="至少 6 位"
+              autoComplete="new-password"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="确认新密码"
+            name="confirmPassword"
+            dependencies={['newPassword']}
+            rules={[
+              { required: true, message: '请再次输入新密码' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('newPassword') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('两次输入的密码不一致'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="再次输入新密码"
+              autoComplete="new-password"
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={submitting}>
+              更新密码
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
+  );
+};
 
 const UserSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('basic');
@@ -563,8 +698,18 @@ const UserSettings: React.FC = () => {
                         <td style={{ padding: '12px' }}>{item.title}</td>
                         <td style={{ padding: '12px' }}>{item.type === 'project' ? '项目' : item.type === 'article' ? '文章' : '插件'}</td>
                         <td style={{ padding: '12px' }}>{item.id}</td>
-                        <td style={{ padding: '12px' }}>{item.defaultImage ? '✓' : '✗'}</td>
-                        <td style={{ padding: '12px' }}>{item.hoverImage ? '✓' : '✗'}</td>
+                        <td style={{ padding: '12px', verticalAlign: 'middle' }}>
+                          <RecommendationTableThumb
+                            src={item.defaultImage}
+                            alt={`${item.title} 默认图`}
+                          />
+                        </td>
+                        <td style={{ padding: '12px', verticalAlign: 'middle' }}>
+                          <RecommendationTableThumb
+                            src={item.hoverImage}
+                            alt={`${item.title} 悬停图`}
+                          />
+                        </td>
                         <td style={{ padding: '12px' }}>
                           <input 
                             type="checkbox" 
@@ -610,6 +755,9 @@ const UserSettings: React.FC = () => {
               </div>
             </div>
           </TabPane>
+          <TabPane tab="账户安全" key="security">
+            <ChangePasswordPanel />
+          </TabPane>
         </Tabs>
       </Card>
 
@@ -652,7 +800,8 @@ const UserSettings: React.FC = () => {
           </Form.Item>
 
           <p style={{ margin: '0 0 12px', color: 'rgba(0,0,0,0.45)', fontSize: 12 }}>
-            默认 / 悬停图先缓存在浏览器（blob 预览），确认列表无误后点击页面上的「保存配置」再统一上传服务器。
+            单张图片不超过 5MB；不限制像素尺寸。下方列表中缩略图固定为 64×64
+            仅作展示。选择后先以浏览器预览（blob），确认后点击「保存配置」再统一传服务器。
           </p>
           
           <Form.Item
@@ -663,6 +812,7 @@ const UserSettings: React.FC = () => {
             <DeferredImageUpload
               pendingFilesRef={recommendationPendingFilesRef}
               commitHint="已选择，点击「保存配置」后上传服务器"
+              maxSizeMB={5}
             />
           </Form.Item>
 
@@ -674,6 +824,7 @@ const UserSettings: React.FC = () => {
             <DeferredImageUpload
               pendingFilesRef={recommendationPendingFilesRef}
               commitHint="已选择，点击「保存配置」后上传服务器"
+              maxSizeMB={5}
             />
           </Form.Item>
           

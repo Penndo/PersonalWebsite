@@ -23,3 +23,19 @@
     }
   }
 
+// 推荐列表：仅展示图本身，无边框/底；上传输出仍为 64×64
+.recommendation-thumb {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.recommendation-thumb--empty {
+  display: inline-block;
+  min-width: 1ch;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  line-height: 1;
+}
+

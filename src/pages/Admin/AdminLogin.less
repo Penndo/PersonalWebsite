@@ -1,0 +1,146 @@
+@import '@/styles/variables.less';
+
+.admin-login {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: @bg-base;
+  color: @ink;
+  overflow: hidden;
+}
+
+.admin-login__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 20% 15%,
+      fade(@accent, 14%) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 80% 85%,
+      fade(@accent-warm, 10%) 0%,
+      transparent 55%
+    ),
+    linear-gradient(180deg, @bg-base 0%, #0a0a07 100%);
+}
+
+.admin-login__card {
+  position: relative;
+  width: min(420px, 100%);
+  padding: 40px 36px 32px;
+  background: @surface-2;
+  border: 1px solid @line;
+  border-radius: 16px;
+  backdrop-filter: blur(14px);
+  box-shadow: @shadow-card;
+}
+
+.admin-login__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  font-family: @font-mono;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: @ink-faint;
+}
+
+.admin-login__brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, @accent 0%, @accent-warm 100%);
+  color: @bg-base;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.admin-login__brand-meta {
+  color: @ink-muted;
+}
+
+.admin-login__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: @ink;
+}
+
+.admin-login__subtitle {
+  margin: 0 0 28px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: @ink-faint;
+}
+
+.admin-login__form {
+  // antd 暗色 form 在亮色 surface 上的可读性微调
+  .ant-form-item-label > label {
+    color: @ink-dim;
+    font-size: 13px;
+  }
+
+  .ant-input,
+  .ant-input-password,
+  .ant-input-affix-wrapper {
+    background: rgba(0, 0, 0, 0.25);
+    border-color: @line;
+    color: @ink;
+
+    .ant-input {
+      background: transparent;
+      color: @ink;
+    }
+
+    input::placeholder {
+      color: @ink-muted;
+    }
+
+    .anticon {
+      color: @ink-faint;
+    }
+
+    &:hover,
+    &:focus,
+    &.ant-input-affix-wrapper-focused {
+      border-color: @accent;
+      box-shadow: 0 0 0 2px fade(@accent, 18%);
+    }
+  }
+
+  .ant-btn-primary {
+    height: 44px;
+    background: linear-gradient(180deg, @accent 0%, @accent-warm 100%);
+    border-color: transparent;
+    color: @bg-base;
+    font-weight: 600;
+    box-shadow: @shadow-cta;
+
+    &:hover,
+    &:focus {
+      background: linear-gradient(180deg, @accent 0%, @accent-deep 100%);
+      box-shadow: @shadow-cta-hover;
+      color: @bg-base;
+    }
+  }
+}
+
+.admin-login__footer {
+  margin: 20px 0 0;
+  font-size: 12px;
+  color: @ink-muted;
+  text-align: center;
+}
