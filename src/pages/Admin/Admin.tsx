@@ -15,7 +15,7 @@ const Admin: React.FC = () => {
       <AdminSider collapsed={collapsed} />
       <Layout>
         <AdminHeader collapsed={collapsed} onCollapse={setCollapsed} />
-        <Content style={{ padding: 24, background: token.colorBgLayout }}>
+        <Content style={{ padding: '24px 24px', background: token.colorBgLayout }}>
           <div style={{ maxWidth: 1000, margin: '0 auto' }}>
             <Outlet />
           </div>

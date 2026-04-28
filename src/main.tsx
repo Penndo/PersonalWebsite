@@ -35,8 +35,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="projects" element={<ProjectsManage />} />
           <Route path="articles" element={<ArticlesManage />} />
           <Route path="plugins" element={<PluginsManage />} />
-          <Route path="editor/:type" element={<Editor type="project" />} />
-          <Route path="editor/:type/:id" element={<Editor type="project" />} />
+          <Route path="editor/:type" element={<Editor />} />
+          <Route path="editor/:type/:id" element={<Editor />} />
         </Route>
       </Routes>
     </BrowserRouter>

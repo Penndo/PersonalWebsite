@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { message, Spin } from 'antd';
+import { Button, message, Spin } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import EditorForm from './EditorForm';
 import MarkdownEditor from './MarkdownEditor';
 import { projectApi, articleApi, pluginApi } from '@/services/api';
@@ -9,13 +10,33 @@ import './Editor.less';
 
 type EditorType = 'project' | 'article' | 'plugin';
 
+const VALID_TYPES: readonly EditorType[] = ['project', 'article', 'plugin'];
+const TYPE_LABEL: Record<EditorType, string> = {
+  project: '项目',
+  article: '文章',
+  plugin: '插件',
+};
+
 interface EditorProps {
-  type: EditorType;
+  /** 仅作向后兼容：实际类型来自路由参数 :type */
+  type?: EditorType;
 }
 
-const Editor: React.FC<EditorProps> = ({ type }) => {
+const Editor: React.FC<EditorProps> = ({ type: typeProp }) => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { type: typeParam, id } = useParams<{ type?: string; id?: string }>();
+
+  /** 真实的 EditorType 始终来自 URL；prop 仅作兜底 */
+  const type = useMemo<EditorType>(() => {
+    const candidate = typeParam ?? typeProp;
+    if (candidate && (VALID_TYPES as readonly string[]).includes(candidate)) {
+      return candidate as EditorType;
+    }
+    return 'project';
+  }, [typeParam, typeProp]);
+
+  const typeLabel = TYPE_LABEL[type];
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,6 +47,14 @@ const Editor: React.FC<EditorProps> = ({ type }) => {
     tags: [] as string[],
     content: '',
   });
+
+  useEffect(() => {
+    const candidate = typeParam ?? typeProp;
+    if (candidate && !(VALID_TYPES as readonly string[]).includes(candidate)) {
+      message.error(`未知的编辑类型：${candidate}`);
+      navigate(-1);
+    }
+  }, [typeParam, typeProp, navigate]);
 
   useEffect(() => {
     if (id) {
@@ -78,33 +107,32 @@ const Editor: React.FC<EditorProps> = ({ type }) => {
         tags: formData.tags,
       };
 
-      let response;
       if (id) {
         switch (type) {
           case 'project':
-            response = await projectApi.updateProject(id, data);
+            await projectApi.updateProject(id, data);
             break;
           case 'article':
-            response = await articleApi.updateArticle(id, data);
+            await articleApi.updateArticle(id, data);
             break;
           case 'plugin':
-            response = await pluginApi.updatePlugin(id, data);
+            await pluginApi.updatePlugin(id, data);
             break;
         }
-        message.success('更新成功');
+        message.success(`${typeLabel}更新成功`);
       } else {
         switch (type) {
           case 'project':
-            response = await projectApi.createProject(data);
+            await projectApi.createProject(data);
             break;
           case 'article':
-            response = await articleApi.createArticle(data);
+            await articleApi.createArticle(data);
             break;
           case 'plugin':
-            response = await pluginApi.createPlugin(data);
+            await pluginApi.createPlugin(data);
             break;
         }
-        message.success('创建成功');
+        message.success(`${typeLabel}创建成功`);
       }
 
       navigate(-1);
@@ -137,9 +165,18 @@ const Editor: React.FC<EditorProps> = ({ type }) => {
       transition={{ duration: 0.3 }}
     >
       <div className="editor-header">
-        <h1>{id ? '编辑' : '新建'}{type === 'project' ? '项目' : type === 'article' ? '文章' : '插件'}</h1>
+        <div className="editor-header-left">
+          <Button
+            className="editor-back-btn"
+            icon={<ArrowLeftOutlined />}
+            onClick={handleCancel}
+          >
+            返回
+          </Button>
+          <h1>{id ? '编辑' : '新建'}{typeLabel}</h1>
+        </div>
       </div>
-      
+
       <div className="editor-content">
         <EditorForm
           formData={formData}
@@ -149,7 +186,7 @@ const Editor: React.FC<EditorProps> = ({ type }) => {
           onCancel={handleCancel}
           saving={saving}
         />
-        
+
         <MarkdownEditor
           content={formData.content}
           onChange={(content) => setFormData({ ...formData, content })}
