@@ -300,6 +300,12 @@ const UserSettings: React.FC = () => {
     return false;
   };
 
+  const handleRemovePortfolio = () => {
+    if (!userInfo) return;
+    setUserInfo({ ...userInfo, portfolio: '' });
+    message.success('已移除作品集链接，点击「保存基础信息」后生效');
+  };
+
   const handleSaveUser = async () => {
     if (!userInfo) return;
     setSaving(true);
@@ -591,7 +597,7 @@ const UserSettings: React.FC = () => {
                     />
                   </Form.Item>
                   <Form.Item label="作品集" required>
-                    <div style={{ display: 'flex', gap: '16px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
                       <Input
                         value={userInfo.portfolio}
                         onChange={(e) => handleUserChange('portfolio', e.target.value)}
@@ -618,6 +624,18 @@ const UserSettings: React.FC = () => {
                           上传 PDF
                         </Button>
                       </Upload>
+                      <Popconfirm
+                        title="确认删除已上传的作品集吗？"
+                        description="删除后请点击“保存基础信息”提交变更。"
+                        onConfirm={handleRemovePortfolio}
+                        okText="确认"
+                        cancelText="取消"
+                        disabled={!userInfo.portfolio}
+                      >
+                        <Button danger disabled={!userInfo.portfolio}>
+                          删除
+                        </Button>
+                      </Popconfirm>
                     </div>
                   </Form.Item>
                   <Form.Item label="电话" required>
