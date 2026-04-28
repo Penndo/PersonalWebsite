@@ -3,14 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header, TabNav, Card } from '@/components';
 import { tabsApi, projectApi, articleApi, pluginApi } from '@/services/api';
-import type { TabType, Project, Article, Plugin } from '@/types';
+import type { TabType, Project, Article, Plugin, UserInfo } from '@/types';
 import './Products.less';
 
 interface ProductsProps {
   currentSection: 'home' | 'products';
+  userInfo: UserInfo;
 }
 
-const Products: React.FC<ProductsProps> = ({ currentSection }) => {
+const Products: React.FC<ProductsProps> = ({ currentSection, userInfo }) => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
@@ -241,7 +242,7 @@ const Products: React.FC<ProductsProps> = ({ currentSection }) => {
 
   return (
     <section className="products">
-      <Header />
+      <Header userInfo={userInfo} />
       
       {currentSection === 'products' && (
         <div className="products-header">

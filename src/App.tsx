@@ -188,7 +188,7 @@ function App() {
         onScrollDown={() => scrollToSection(productsRef.current, 'products')}
       />
       <div ref={productsRef}>
-        <Products currentSection={currentSection} />
+        <Products currentSection={currentSection} userInfo={effectiveUser} />
       </div>
     </div>
   );
