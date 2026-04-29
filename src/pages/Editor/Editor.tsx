@@ -170,8 +170,9 @@ const Editor: React.FC<EditorProps> = ({ type: typeProp }) => {
             className="editor-back-btn"
             icon={<ArrowLeftOutlined />}
             onClick={handleCancel}
+            type="text"
           >
-            返回
+            {/* 返回 */}
           </Button>
           <h1>{id ? '编辑' : '新建'}{typeLabel}</h1>
         </div>

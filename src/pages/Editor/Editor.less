@@ -60,10 +60,10 @@
 
   .editor-header {
     display: flex;
-    justify-content: space-between;
+    // justify-content: space-between;
     align-items: center;
     padding: 18px 24px;
-    background: @editor-surface-soft;
+    background: @editor-surface;
     border-bottom: 1px solid @editor-border;
 
     .editor-header-left {
@@ -73,12 +73,12 @@
     }
 
     .editor-back-btn {
-      border-color: @editor-border-strong;
+      // border-color: @editor-border-strong;
       color: @editor-text-secondary;
 
       &:hover {
-        border-color: @editor-accent;
-        color: @editor-accent;
+        // border-color: @editor-accent;
+        color: @editor-text;
       }
     }
 
@@ -136,20 +136,16 @@
     display: flex;
     flex-direction: row;
     gap: 0;
-    height: calc(100vh - 220px);
+    height: calc(100vh - 184px);
     min-height: 520px;
-    max-height: calc(100vh - 220px);
+    // max-height: calc(100vh - 220px);
     overflow: hidden;
   }
 
   .editor-form {
     width: 32%;
     min-width: 280px;
-    padding: 24px;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
     border-right: 1px solid @editor-border;
     background: @editor-surface;
 
@@ -159,8 +155,8 @@
       gap: 8px;
 
       label {
-        font-size: 0.9rem;
-        font-weight: 500;
+        font-size: 0.875rem;
+        font-weight: 400;
         color: @editor-text;
 
         .required {
@@ -171,111 +167,39 @@
 
       .char-count {
         margin-left: auto;
-        font-size: 0.8rem;
+        font-size: 0.875rem;
         color: @editor-text-muted;
         font-weight: 400;
       }
 
       .form-hint {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         color: @editor-text-muted;
         line-height: 1.4;
       }
-    }
-
-    .cover-upload {
-      .upload-area {
-        border: 2px dashed @editor-border-strong;
-        border-radius: @editor-radius-sm;
-        padding: 36px;
-        text-align: center;
-        cursor: pointer;
-        transition: border-color 0.2s ease, background 0.2s ease;
-
-        &:hover {
-          border-color: @editor-accent;
-          background: fade(@editor-accent, 5%);
-        }
-
-        .upload-icon {
-          font-size: 2rem;
-          color: @editor-text-muted;
-          margin-bottom: 12px;
-        }
-
-        p {
-          color: @editor-text-secondary;
-          margin-bottom: 8px;
-        }
-
-        .upload-hint {
-          font-size: 0.8rem;
-          color: @editor-text-muted;
-        }
-      }
-
-      .cover-preview {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: @editor-radius-sm;
-        overflow: hidden;
-        position: relative;
-
-        img {
-          width: 100%;
-          height: 200px;
-          object-fit: cover;
-        }
-
-        button,
-        .remove-cover {
-          position: absolute;
-          top: 8px;
-          right: 8px;
-        }
-
-        .remove-cover {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background: rgba(0, 0, 0, 0.45);
-          border: none;
-          color: #fff;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: background 0.2s ease;
-
-          &:hover {
-            background: rgba(0, 0, 0, 0.65);
-          }
-        }
-      }
-    }
-
-    .form-divider {
-      text-align: center;
-      color: @editor-text-muted;
-      font-size: 12px;
-      margin: 4px 0;
     }
 
     .tags-preview {
       margin-top: 4px;
     }
 
+    .editor-form-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
     .form-actions {
       display: flex;
       gap: 12px;
+      padding: 16px 24px;
       margin-top: auto;
       position: sticky;
       bottom: 0;
       z-index: 2;
-      padding-top: 12px;
-      padding-bottom: 4px;
-      background: @editor-surface;
+      background: fade(@editor-surface, 50%);
+      backdrop-filter: blur(10px);
       border-top: 1px solid @editor-border;
 
       button {
@@ -667,12 +591,12 @@
       max-height: none;
     }
 
-    .editor-form {
-      width: 100%;
-      max-height: 50vh;
-      border-right: none;
-      border-bottom: 1px solid @editor-border;
-    }
+    // .editor-form {
+    //   width: 100%;
+    //   max-height: 50vh;
+    //   border-right: none;
+    //   border-bottom: 1px solid @editor-border;
+    // }
 
     .formatting-toolbar {
       flex-wrap: wrap;
