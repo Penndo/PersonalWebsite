@@ -99,12 +99,15 @@ const Editor: React.FC<EditorProps> = ({ type: typeProp }) => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (
+    payload?: typeof formData,
+  ) => {
+    const source = payload ?? formData;
     setSaving(true);
     try {
       const data = {
-        ...formData,
-        tags: formData.tags,
+        ...source,
+        tags: source.tags,
       };
 
       if (id) {
@@ -174,7 +177,7 @@ const Editor: React.FC<EditorProps> = ({ type: typeProp }) => {
           >
             {/* 返回 */}
           </Button>
-          <h1>{id ? '编辑' : '新建'}{typeLabel}</h1>
+          <h3>{id ? '编辑' : '新建'}{typeLabel}</h3>
         </div>
       </div>
 

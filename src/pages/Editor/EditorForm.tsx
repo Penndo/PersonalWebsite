@@ -1,8 +1,11 @@
-import { useState } from 'react';
-import { Input, Button, Upload, Image, Tag, Space, message } from 'antd';
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
+import { useEffect, useRef, useState } from 'react';
+import { Input, Button, Tag, Space, message, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { uploadApi } from '@/services/api';
 import imageCompression from 'browser-image-compression';
+import DeferredImageUpload, {
+  clearAllDeferredBlobs,
+} from '@/components/DeferredImageUpload/DeferredImageUpload';
 import './Editor.less';
 
 interface EditorFormProps {
@@ -16,10 +19,42 @@ interface EditorFormProps {
   };
   setFormData: (data: any) => void;
   type: 'project' | 'article' | 'plugin';
-  onSave: () => void;
+  onSave: (data: EditorFormProps['formData']) => void;
   onCancel: () => void;
   saving: boolean;
 }
+
+interface FormLabelProps {
+  title: string;
+  require?: boolean;
+  charCount?: number;
+  charCountMax?: number;
+  tips?: boolean | string;
+}
+
+const FormLabel: React.FC<FormLabelProps> = ({
+  title,
+  require = false,
+  charCount,
+  charCountMax,
+  tips,
+}) => (
+  <label className="form-label">
+    <span>{title}</span>
+    {require && <span className="required">*</span>}
+    {typeof tips === 'string' && tips.trim().length > 0 && (
+      <Tooltip title={tips}>
+        <InfoCircleOutlined className='form-label-tips' />
+      </Tooltip>
+    )}
+    {charCount !== undefined && (
+      <span className="char-count">
+        {charCount}
+        {charCountMax !== undefined ? `/${charCountMax}` : ''}
+      </span>
+    )}
+  </label>
+);
 
 const EditorForm: React.FC<EditorFormProps> = ({
   formData,
@@ -29,31 +64,22 @@ const EditorForm: React.FC<EditorFormProps> = ({
   saving,
 }) => {
   const [uploading, setUploading] = useState(false);
+  const coverPendingFilesRef = useRef<Map<string, File>>(new Map());
 
-  const handleImageUpload = async (file: File) => {
-    try {
-      setUploading(true);
+  useEffect(() => {
+    return () => {
+      clearAllDeferredBlobs(coverPendingFilesRef);
+    };
+  }, []);
 
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        initialQuality: 0.8,
-        fileType: 'image/jpeg',
-      };
-
-      const compressedFile = await imageCompression(file, options);
-
-      const response = await uploadApi.uploadImage(compressedFile);
-      setFormData({ ...formData, coverUrl: response.data.url });
-      message.success('图片上传成功');
-    } catch (error) {
-      console.error('Image upload failed:', error);
-      message.error('图片上传失败，请重试');
-    } finally {
-      setUploading(false);
+  /** 手动改 URL 时若覆盖本地 blob 预览，则释放 blob */
+  const handleCoverUrlInput = (next: string) => {
+    const prev = formData.coverUrl;
+    if (typeof prev === 'string' && prev.startsWith('blob:') && prev !== next) {
+      coverPendingFilesRef.current.delete(prev);
+      URL.revokeObjectURL(prev);
     }
-    return false;
+    setFormData({ ...formData, coverUrl: next });
   };
 
   const handleTagsChange = (value: string) => {
@@ -101,20 +127,49 @@ const EditorForm: React.FC<EditorFormProps> = ({
     return true;
   };
 
-  const handleSaveClick = () => {
-    if (validateForm()) {
-      onSave();
+  const handleSaveClick = async () => {
+    if (!validateForm()) return;
+
+    let payload = { ...formData };
+    const u = payload.coverUrl;
+    if (typeof u === 'string' && u.startsWith('blob:')) {
+      const file = coverPendingFilesRef.current.get(u);
+      if (!file) {
+        message.error('封面仅在本地预览，请重新选择后再保存');
+        return;
+      }
+      setUploading(true);
+      try {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          initialQuality: 0.8,
+          fileType: 'image/jpeg',
+        };
+        const compressedFile = await imageCompression(file, options);
+        const { data } = await uploadApi.uploadImage(compressedFile);
+        coverPendingFilesRef.current.delete(u);
+        URL.revokeObjectURL(u);
+        payload = { ...payload, coverUrl: data.url };
+        setFormData(payload);
+      } catch (error) {
+        console.error('Cover upload failed:', error);
+        message.error('封面上传失败，请重试');
+        return;
+      } finally {
+        setUploading(false);
+      }
     }
+
+    onSave(payload);
   };
 
   return (
     <div className="editor-form"> 
       <div className="editor-form-content">
         <div className="form-section">
-          <label className="form-label">
-            标题 <span className="required">*</span>
-            <span className="char-count">{formData.title.length}/50</span>
-          </label>
+          <FormLabel title="标题" require charCount={formData.title.length} charCountMax={50} />
           <Input
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -125,9 +180,7 @@ const EditorForm: React.FC<EditorFormProps> = ({
         </div>
 
         <div className="form-section">
-          <label className="form-label">
-            路由ID <span className="required">*</span>
-          </label>
+          <FormLabel title="路由ID" require />
           <Input
             value={formData.routeId}
             onChange={(e) => setFormData({ ...formData, routeId: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
@@ -138,10 +191,7 @@ const EditorForm: React.FC<EditorFormProps> = ({
         </div>
 
         <div className="form-section">
-          <label className="form-label">
-            摘要 <span className="required">*</span>
-            <span className="char-count">{formData.summary.length}/300</span>
-          </label>
+          <FormLabel title="摘要" require charCount={formData.summary.length} charCountMax={300} />
           <Input.TextArea
             value={formData.summary}
             onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
@@ -153,59 +203,32 @@ const EditorForm: React.FC<EditorFormProps> = ({
         </div>
 
         <div className="form-section">
-          <label className="form-label">
-            封面图片 <span className="required">*</span>
-          </label>
-          
-          {formData.coverUrl && (
-            <div className="cover-preview">
-              <Image
-                src={formData.coverUrl}
-                alt="封面预览"
-              />
-              <Button
-                type="text"
-                danger
-                onClick={() => setFormData({ ...formData, coverUrl: '' })}
-                className="remove-cover"
-              >
-                删除
-              </Button>
-            </div>
-          )}
+          <FormLabel title="封面图片" require />
 
-          <Upload.Dragger
-            name="file"
-            multiple={false}
-            beforeUpload={handleImageUpload}
-            showUploadList={false}
-            disabled={uploading}
-            accept="image/*"
-          >
-            <p className="ant-upload-drag-icon">
-              <UploadOutlined />
-            </p>
-            <p className="ant-upload-text">点击或拖拽文件到此处上传</p>
-            <p className="ant-upload-hint">
-              支持 JPG、PNG 等格式，自动压缩至1MB以内
-            </p>
-          </Upload.Dragger>
-
-          <div className="form-divider">或</div>
-
-          <Input
-            placeholder="或直接输入图片 URL"
+          <DeferredImageUpload
             value={formData.coverUrl}
-            onChange={(e) => setFormData({ ...formData, coverUrl: e.target.value })}
+            onChange={(url) => setFormData({ ...formData, coverUrl: url })}
+            pendingFilesRef={coverPendingFilesRef}
+            commitHint="已选择，点击「保存」后上传服务器"
+          />
+          <Input
+            style={{ marginTop: 8 }}
+            value={formData.coverUrl}
+            onChange={(e) => handleCoverUrlInput(e.target.value)}
+            placeholder="或直接填写图片 URL"
           />
         </div>
 
         <div className="form-section">
-          <label className="form-label">
-            标签 <span className="required">*</span>
-            <span className="char-count">{formData.tags.length}/10</span>
-          </label>
-          <Input
+          <FormLabel
+            title="标签"
+            require
+            charCount={formData.tags.length}
+            charCountMax={10}
+            tips="使用逗号分隔多个标签"
+          />
+          <Input.TextArea
+            rows={3}
             value={formData.tags.join(', ')}
             onChange={(e) => handleTagsChange(e.target.value)}
             placeholder="请输入标签，用逗号分隔（如：React, TypeScript, 前端开发）"

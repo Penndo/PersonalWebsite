@@ -62,14 +62,14 @@
     display: flex;
     // justify-content: space-between;
     align-items: center;
-    padding: 18px 24px;
+    padding: 12px 24px;
     background: @editor-surface;
     border-bottom: 1px solid @editor-border;
 
     .editor-header-left {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
 
     .editor-back-btn {
@@ -161,7 +161,16 @@
 
         .required {
           color: #ff4d4f;
-          margin-left: 4px;
+        }
+      }
+
+      .form-label {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+
+        .form-label-tips {
+          color: @editor-text-muted;
         }
       }
 
